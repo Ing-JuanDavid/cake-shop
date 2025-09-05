@@ -1,0 +1,41 @@
+package com.juan.cakeshop.api.dto;
+
+import com.juan.cakeshop.api.dto.requests.ProductDto;
+import com.juan.cakeshop.api.dto.responses.ProductResponse;
+import com.juan.cakeshop.api.model.Product;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
+public class ProductMapper {
+    public Product toEntity(ProductDto request)
+    {
+        return Product.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .cant(request.getCant())
+                .build();
+    }
+
+    public ProductResponse toResponse(Product product)
+    {
+        return ProductResponse.builder()
+                .productId(product.getProductId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .cant(product.getCant())
+                .categoryName(product.getCategory().getName())
+                .imgUrl(product.getImg())
+                .build();
+    }
+
+    public List<ProductResponse> products(List<Product> products)
+    {
+        return products.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+}
