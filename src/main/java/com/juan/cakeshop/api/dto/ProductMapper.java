@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 
 @Component
 public class ProductMapper {
-    public Product toEntity(ProductDto request)
+    public Product toEntity(ProductDto productDto)
     {
         return Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .cant(request.getCant())
+                .name(productDto.getName())
+                .description(productDto.getDescription())
+                .price(productDto.getPrice())
+                .cant(productDto.getCant())
                 .build();
     }
 
@@ -37,5 +37,12 @@ public class ProductMapper {
         return products.stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    public void updateFromDto(ProductDto productDto, Product savedProduct) {
+        savedProduct.setName(productDto.getName());
+        savedProduct.setPrice(productDto.getPrice());
+        savedProduct.setDescription(productDto.getDescription());
+        savedProduct.setCant(productDto.getCant());
     }
 }

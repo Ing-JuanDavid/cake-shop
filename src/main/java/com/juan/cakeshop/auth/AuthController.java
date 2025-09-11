@@ -32,10 +32,5 @@ public class AuthController {
         return ResponseEntity.ok(authService.changePassword(request));
     }
 
-    @GetMapping("/hello")
-    public  void hello()
-    {
-        System.out.println("he;llo");
-    }
 
 }

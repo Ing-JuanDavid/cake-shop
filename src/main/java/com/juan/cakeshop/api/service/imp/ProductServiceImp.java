@@ -8,16 +8,15 @@ import com.juan.cakeshop.api.model.Product;
 import com.juan.cakeshop.api.repository.CategoryRepository;
 import com.juan.cakeshop.api.repository.ProductRepository;
 import com.juan.cakeshop.api.service.ProductService;
+import com.juan.cakeshop.exception.customExceptions.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,70 +29,86 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public List<ProductResponse> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        List<ProductResponse> productResponses = new ArrayList<>();
-
-        if(products.isEmpty()) return productResponses;
-
-        productResponses = productMapper.products(products);
-
-        return productResponses;
+        return productRepository.findAll().stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> createProduct(ProductDto request) {
-        // 1. Validar existencia de categoría
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+    public ProductResponse createProduct(ProductDto productDto) {
 
-        // 2. Validar que haya imagen
-        if (request.getImg() == null || request.getImg().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Image is required"));
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(productDto.getCategoryId()));
+
+        if (productDto.getImg() == null || productDto.getImg().isEmpty()) {
+            throw new InvalidProductImageException();
         }
 
-        try {
-            // 3. Subir imagen a Cloudinary
-            String imageUrl = cloudinaryServiceImp.uploadedImg(request.getImg(), "folder_1");
-            if (imageUrl == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Error uploading image"));
-            }
+        String imageUrl = cloudinaryServiceImp.uploadedImg(productDto.getImg(), "folder_1");
 
-            // 4. Mapear y guardar producto
-            Product product = productMapper.toEntity(request);
-            product.setCategory(category);
-            product.setImg(imageUrl);
+        Product product = productMapper.toEntity(productDto);
+        product.setCategory(category);
+        product.setImg(imageUrl);
 
-            productRepository.save(product);
+        productRepository.save(product);
 
-            // 5. Devolver respuesta
-            return ResponseEntity.ok(Map.of("product", productMapper.toResponse(product)));
-
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Unexpected error: " + e.getMessage()));
-        }
+        return productMapper.toResponse(product);
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> deleteProduct(int id) {
-        if(id <= 0) return ResponseEntity.badRequest()
-                .body(Map.of("error", "Id must be greater than 0"));
+    public ProductResponse deleteProduct(int productId) {
+        if(productId <= 0) throw new InvalidProductIdException();
 
-        Product product = productRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product, not found")
+        Product product = productRepository.findById(productId).orElseThrow(
+                ()-> new ProductNotFoundException(productId)
         );
 
         boolean deleted = cloudinaryServiceImp.deleteImg("folder_1",product.getImg());
 
-        if(! deleted){
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Failed to delete product img from cloudinary"));
-        }
+        if(! deleted) throw new CloudinaryException("Failed to delete product's image from cloudinary", HttpStatus.INTERNAL_SERVER_ERROR);
 
         productRepository.delete(product);
 
-        return ResponseEntity.ok(Map.of(
-                "message", "Product deleted successfully",
-                "productId", id));
+        return productMapper.toResponse(product);
     }
+
+    @Override
+    public ProductResponse updateProduct(int productId, ProductDto productDto) {
+
+        Product savedProduct = productRepository.findById(productId)
+                .orElseThrow(()-> new ProductNotFoundException(productId));
+
+        var productDtoCategoryId = productDto.getCategoryId();
+        Category category = savedProduct.getCategory();
+
+        if(!Objects.equals(productDtoCategoryId, savedProduct.getCategory().getCategoryId()))
+            category = categoryRepository.findById(productDtoCategoryId).orElseThrow(()->new CategoryNotFoundException(productDtoCategoryId));
+
+        String imgUrl = savedProduct.getImg();
+
+        if(productDto.getImg() != null &&  !productDto.getImg().isEmpty()){
+            if(imgUrl != null)
+                cloudinaryServiceImp.deleteImg("folder_1", imgUrl);
+            imgUrl = cloudinaryServiceImp.uploadedImg(productDto.getImg(), "folder_1");
+        }
+
+        productMapper.updateFromDto(productDto, savedProduct);
+        savedProduct.setCategory(category);
+        savedProduct.setImg(imgUrl);
+
+        Product updateProduct = productRepository.save(savedProduct);
+
+        return productMapper.toResponse(updateProduct);
+    }
+
+    @Override
+    public ProductResponse getProduct(int productId) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                ()-> new ProductNotFoundException(productId)
+        );
+
+        return productMapper.toResponse(product);
+    }
+
+
 }

@@ -4,8 +4,11 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.juan.cakeshop.api.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.protocol.HTTP;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,8 +30,7 @@ public class CloudinaryServiceImp implements CloudinaryService {
             return cloudinary.url().secure(true).generate(publicId);
 
         }catch (IOException e){
-            e.printStackTrace();
-            return null;
+           throw  new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload product's img");
         }
     }
 
