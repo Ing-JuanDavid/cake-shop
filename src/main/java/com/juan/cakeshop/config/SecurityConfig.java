@@ -32,6 +32,7 @@ public class SecurityConfig {
                                         "/auth/**",
                                         "/products",
                                         "/products/{productId}",
+                                        "/products/{productId}/rates",
                                         "/categories",
                                         "/categories/{categoryId}",
                                         "/v3/api-docs/**",

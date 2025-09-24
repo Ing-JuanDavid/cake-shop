@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Table(name = "product")
@@ -21,11 +24,16 @@ public class Product {
     private String name;
     private Integer price;
     private String description;
-    private Integer cant;
+    private Integer quant;
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-    private Integer score;
+    private Float score;
     private String img;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<CartProduct> productCart = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Rate> rates = new ArrayList<>();
 }

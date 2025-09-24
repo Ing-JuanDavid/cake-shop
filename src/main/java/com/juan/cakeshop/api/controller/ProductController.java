@@ -32,9 +32,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts()
+    public ResponseEntity<GenericResponse<List<ProductResponse>>> getAllProducts()
     {
-        return ResponseEntity.ok(productService.getAllProducts());
+        return ResponseEntity.ok(GenericResponse.<List<ProductResponse>>builder()
+                .message("ok")
+                .data(productService.getAllProducts())
+                .build());
     }
 
     @GetMapping("/{productId}")

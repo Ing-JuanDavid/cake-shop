@@ -3,7 +3,6 @@ package com.juan.cakeshop.api.controller;
 import com.juan.cakeshop.api.dto.requests.CategoryDto;
 import com.juan.cakeshop.api.dto.responses.CategoryResponse;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
-import com.juan.cakeshop.api.model.Category;
 import com.juan.cakeshop.api.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +29,21 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories()
+    public ResponseEntity<GenericResponse<List<CategoryResponse>>> getAllCategories()
     {
-        return ResponseEntity.ok(categoryService.getAll());
+        return ResponseEntity.ok(GenericResponse.<List<CategoryResponse>>builder()
+                .message("ok")
+                .data(categoryService.getAllCategories())
+                .build());
+    }
+
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<GenericResponse<CategoryResponse>> getCategory(@PathVariable int categoryId)
+    {
+        return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
+                .message("ok")
+                .data(categoryService.getCategory(categoryId))
+                .build());
     }
 
     @PutMapping("/update/{categoryId}")
@@ -49,6 +60,14 @@ public class CategoryController {
     }
 
     // Delete category ...
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("delete/{categoryId}")
+    public ResponseEntity<GenericResponse<CategoryResponse>> deleteCategory(@PathVariable  int categoryId)
+    {
+        return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
+                .message("ok")
+                .data(categoryService.deleteCategory(categoryId))
+                .build());
+    }
 
 }

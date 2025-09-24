@@ -21,17 +21,27 @@ public class CategoryServiceImp implements CategoryService {
     final CategoryMapper categoryMapper;
 
     @Override
-    public List<CategoryResponse> getAll() {
+    public CategoryResponse createCategory(CategoryDto categoryDto) {
+        Category category = categoryMapper.toEntity(categoryDto);
+        categoryRepository.save(category);
+        return categoryMapper.toResponse(category);
+    }
+
+    @Override
+    public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll().stream()
                 .map(categoryMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public CategoryResponse createCategory(CategoryDto categoryDto) {
-         Category category = categoryMapper.toEntity(categoryDto);
-         categoryRepository.save(category);
-         return categoryMapper.toResponse(category);
+    public CategoryResponse getCategory(int categoryId)
+    {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                ()-> new CategoryNotFoundException(categoryId)
+        );
+
+        return categoryMapper.toResponse(category);
     }
 
     @Override
@@ -46,5 +56,16 @@ public class CategoryServiceImp implements CategoryService {
         Category updatedCategory = categoryRepository.save(savedCategory);
 
         return categoryMapper.toResponse(updatedCategory);
+    }
+
+    @Override
+    public CategoryResponse deleteCategory(int categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                ()-> new CategoryNotFoundException(categoryId)
+        );
+
+        categoryRepository.delete(category);
+
+        return categoryMapper.toResponse(category);
     }
 }

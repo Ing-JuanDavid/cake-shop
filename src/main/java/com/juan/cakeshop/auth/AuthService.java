@@ -6,6 +6,7 @@ import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.auth.dto.LoginRequest;
 import com.juan.cakeshop.auth.dto.PasswordRequest;
 import com.juan.cakeshop.auth.dto.RegisterRequest;
+import com.juan.cakeshop.exception.customExceptions.EmailInUseException;
 import com.juan.cakeshop.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,12 +22,17 @@ public class AuthService {
 
     final AuthenticationManager authenticationManager;
     final PasswordEncoder passwordEncoder;
-    final UserRepository userRepo;
+    final UserRepository userRepository;
     final UserDetailsService userDetailsService;
     final JwtService jwtService;
 
     public AuthResponse register(RegisterRequest request)
     {
+
+        User userExist = userRepository.findByEmail(request.getEmail()).orElse(null);
+
+        if(userExist != null) throw new EmailInUseException();
+
         var user = User.builder()
                 .nip(request.getNip())
                 .email(request.getEmail())
@@ -39,7 +45,7 @@ public class AuthService {
                 .address(request.getAddress())
                 .build();
 
-        userRepo.save(user);
+        userRepository.save(user);
         return AuthResponse.builder()
                 .token(jwtService.getToken(user))
                 .build();
@@ -58,7 +64,7 @@ public class AuthService {
 
     public AuthResponse changePassword(PasswordRequest request)
     {
-        var user = userRepo.findByEmail(request.getEmail()).orElseThrow(()->new UsernameNotFoundException("user not found"));
+        var user = userRepository.findByEmail(request.getEmail()).orElseThrow(()->new UsernameNotFoundException("user not found"));
         System.out.println("Continue");
 
         var userUpdated = User.builder()
@@ -72,7 +78,7 @@ public class AuthService {
                 .birth(user.getBirth())
                 .address(user.getAddress())
                 .build();
-        userRepo.save(userUpdated);
+        userRepository.save(userUpdated);
 
         return AuthResponse.builder()
                 .token(jwtService.getToken(userUpdated))

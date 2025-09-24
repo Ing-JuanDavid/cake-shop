@@ -11,5 +11,6 @@ public class ProductResponse {
     private Integer price;
     private Integer cant;
     private String categoryName;
+    private Float score;
     private String imgUrl;
 }

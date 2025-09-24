@@ -3,12 +3,12 @@ package com.juan.cakeshop.api.dto;
 import com.juan.cakeshop.api.dto.requests.ProductDto;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.model.Product;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class ProductMapper {
     public Product toEntity(ProductDto productDto)
     {
@@ -16,7 +16,7 @@ public class ProductMapper {
                 .name(productDto.getName())
                 .description(productDto.getDescription())
                 .price(productDto.getPrice())
-                .cant(productDto.getCant())
+                .quant(productDto.getCant())
                 .build();
     }
 
@@ -26,8 +26,9 @@ public class ProductMapper {
                 .productId(product.getProductId())
                 .name(product.getName())
                 .price(product.getPrice())
-                .cant(product.getCant())
+                .cant(product.getQuant())
                 .categoryName(product.getCategory().getName())
+                .score(product.getScore())
                 .imgUrl(product.getImg())
                 .build();
     }
@@ -43,6 +44,6 @@ public class ProductMapper {
         savedProduct.setName(productDto.getName());
         savedProduct.setPrice(productDto.getPrice());
         savedProduct.setDescription(productDto.getDescription());
-        savedProduct.setCant(productDto.getCant());
+        savedProduct.setQuant(productDto.getCant());
     }
 }
