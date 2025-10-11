@@ -3,8 +3,8 @@ package com.juan.cakeshop.exception.customExceptions;
 import org.springframework.http.HttpStatus;
 
 public class EmptyCartException extends BusinessException{
-    public EmptyCartException()
+    public EmptyCartException(String message)
     {
-        super("Something happened to empty cart", HttpStatus.CONFLICT);
+        super(message, HttpStatus.CONFLICT);
     }
 }

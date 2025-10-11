@@ -7,10 +7,12 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,10 +57,20 @@ public class JwtService {
         return getClaim(token, Claims::getSubject);
     }
 
-    public List<String> getRolesFromToken(String token)
+    public List<GrantedAuthority> getRolesFromToken(String token)
     {
-        var claims = getAllClaims(token);
-        return (List<String>) claims.get("roles");
+        Claims claims = getAllClaims(token);
+        Object objRoles = claims.get("roles");
+
+        if(objRoles instanceof List<?>) {
+            return ((List<?>) objRoles).stream()
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
 
     }
 

@@ -1,16 +1,16 @@
 package com.juan.cakeshop.auth;
 
-import com.juan.cakeshop.api.model.Rol;
 import com.juan.cakeshop.api.model.User;
 import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.auth.dto.LoginRequest;
 import com.juan.cakeshop.auth.dto.PasswordRequest;
-import com.juan.cakeshop.auth.dto.RegisterRequest;
-import com.juan.cakeshop.exception.customExceptions.EmailInUseException;
-import com.juan.cakeshop.jwt.JwtService;
+import com.juan.cakeshop.auth.dto.UserDto;
+import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
+import com.juan.cakeshop.exception.customExceptions.UserAlreadyExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,31 +24,20 @@ public class AuthService {
     final PasswordEncoder passwordEncoder;
     final UserRepository userRepository;
     final UserDetailsService userDetailsService;
-    final JwtService jwtService;
+    final UserMapper userMapper;
 
-    public AuthResponse register(RegisterRequest request)
+    public AuthResponse register(UserDto userDto)
     {
+        if(userRepository.existsByEmail(userDto.getEmail()))
+            throw new UserAlreadyExistException("email", userDto.getEmail());
 
-        User userExist = userRepository.findByEmail(request.getEmail()).orElse(null);
+        if(userRepository.existsByNip(userDto.getNip()))
+            throw new UserAlreadyExistException("NIP", String.valueOf(userDto.getNip()));
 
-        if(userExist != null) throw new EmailInUseException();
-
-        var user = User.builder()
-                .nip(request.getNip())
-                .email(request.getEmail())
-                .pass(passwordEncoder.encode(request.getPassword()))
-                .name(request.getName())
-                .birth(request.getBirth())
-                .sex(request.getSex())
-                .rol(Rol.USER)
-                .telf(request.getTelf())
-                .address(request.getAddress())
-                .build();
+        User user = userMapper.toEntity(userDto);
 
         userRepository.save(user);
-        return AuthResponse.builder()
-                .token(jwtService.getToken(user))
-                .build();
+        return userMapper.toResponse(user);
     }
 
     public AuthResponse login(LoginRequest request)
@@ -57,31 +46,26 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        return AuthResponse.builder()
-                .token(jwtService.getToken(userDetailsService.loadUserByUsername(request.getEmail())))
-                .build();
+        UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
+
+        return userMapper.toResponse(user);
     }
 
     public AuthResponse changePassword(PasswordRequest request)
     {
-        var user = userRepository.findByEmail(request.getEmail()).orElseThrow(()->new UsernameNotFoundException("user not found"));
-        System.out.println("Continue");
 
-        var userUpdated = User.builder()
-                .nip(user.getNip())
-                .email(user.getEmail())
-                .name(user.getName())
-                .pass(passwordEncoder.encode(request.getPass()))
-                .rol(user.getRol())
-                .telf(user.getTelf())
-                .sex(user.getSex())
-                .birth(user.getBirth())
-                .address(user.getAddress())
-                .build();
-        userRepository.save(userUpdated);
+        if(request.getEmail() == null || request.getEmail().isBlank()) throw new InvalidInputException("email");
 
-        return AuthResponse.builder()
-                .token(jwtService.getToken(userUpdated))
-                .build();
+        if(request.getPass() == null || request.getPass().isBlank()) throw new InvalidInputException("password");
+
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+                ()->new UsernameNotFoundException("user not found")
+        );
+
+        user.setPass(passwordEncoder.encode(request.getPass()));
+
+        User updatedUser = userRepository.save(user);
+
+        return userMapper.toResponse(updatedUser);
     }
 }

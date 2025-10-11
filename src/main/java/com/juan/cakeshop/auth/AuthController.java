@@ -2,9 +2,11 @@ package com.juan.cakeshop.auth;
 
 import com.juan.cakeshop.auth.dto.LoginRequest;
 import com.juan.cakeshop.auth.dto.PasswordRequest;
-import com.juan.cakeshop.auth.dto.RegisterRequest;
+import com.juan.cakeshop.auth.dto.UserDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,13 +17,13 @@ public class AuthController {
     final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request)
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid UserDto request)
     {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request)
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest request)
     {
         return ResponseEntity.ok(authService.login(request));
     }

@@ -1,21 +1,20 @@
 package com.juan.cakeshop.api.service.imp;
 
 import com.juan.cakeshop.api.dto.CartProductMapper;
+import com.juan.cakeshop.api.dto.requests.CartDto;
 import com.juan.cakeshop.api.dto.responses.CartResponse;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.api.model.Cart;
 import com.juan.cakeshop.api.model.CartProduct;
 import com.juan.cakeshop.api.model.Product;
+import com.juan.cakeshop.api.model.User;
 import com.juan.cakeshop.api.repository.CartProductRepository;
 import com.juan.cakeshop.api.repository.CartRepository;
 import com.juan.cakeshop.api.repository.ProductRepository;
+import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.api.service.CartService;
-import com.juan.cakeshop.exception.customExceptions.EmptyCartException;
-import com.juan.cakeshop.exception.customExceptions.InvalidQuantProductException;
-import com.juan.cakeshop.exception.customExceptions.ProductNotFoundException;
-import com.juan.cakeshop.exception.customExceptions.ProductOutOfStockException;
+import com.juan.cakeshop.exception.customExceptions.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +28,12 @@ public class CartServiceImp implements CartService {
     final CartRepository cartRepository;
     final ProductRepository productRepository;
     final CartProductRepository cartProductRepository;
+    final UserRepository userRepository;
     final CartProductMapper cartProductMapper;
 
     @Override
-    public CartResponse addProduct(com.juan.cakeshop.api.dto.requests.CartDto cartDto) {
+    public CartResponse addProduct(String email, CartDto cartDto) {
         CartProduct cartProduct;
-
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Cart cart = cartRepository.findByEmail(email).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
@@ -47,32 +45,39 @@ public class CartServiceImp implements CartService {
 
         cartProduct = cartProductRepository.findByCartAndProduct(cart, product).orElse(null);
 
-        int newQuant = (cartProduct == null)
-                ? cartDto.getQuant()
-                : cartProduct.getQuant() + cartDto.getQuant();
+        int newQuant = cartDto.getQuant();
 
-        if(newQuant <= 0) throw  new InvalidQuantProductException(newQuant);
+       if(cartProduct == null){
+           cartProduct = cartProductMapper.toEntity(cartDto, product, cart);
+       } else {
+           int oldQuant = cartProduct.getQuant();
 
-       if(newQuant > product.getQuant() ) throw new ProductOutOfStockException(cartDto.getProductId());
+           if(oldQuant > newQuant) newQuant = oldQuant - (oldQuant - newQuant);
 
-       if (cartProduct == null) {
-            cartProduct = cartProductMapper.toEntity(cartDto, product, cart);
+           if(oldQuant < newQuant) newQuant = oldQuant + (newQuant - oldQuant);
        }
-       else {
-            cartProduct.setQuant(newQuant);
-       }
-       return cartProductMapper.toResponse(cartProductRepository.save(cartProduct));
+
+       if(newQuant == 0) throw new InvalidQuantProductException(newQuant);
+
+       if(newQuant > product.getQuant()) throw new ProductOutOfStockException(product.getProductId());
+
+       cartProduct.setQuant(newQuant);
+
+        return cartProductMapper.toResponse(cartProductRepository.save(cartProduct));
     }
 
     @Override
-    public Map<String, Object> getCart() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    public Map<String, Object> getCart(String email) {
 
         Cart cart = cartRepository.findByEmail(email).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
         );
 
-        List<CartProduct> cartProducts = cartProductRepository.findByCart(cart);
+        cart.getCartProduct().removeIf(cartProduct -> cartProduct.getQuant()==0);
+
+        cartRepository.save(cart);
+
+        List<CartProduct> cartProducts = cart.getCartProduct();
 
         return Map.of(
                 "products",cartProductMapper.toList(cartProducts),
@@ -80,7 +85,7 @@ public class CartServiceImp implements CartService {
         );
     }
 
-    private int calcCartTotal(List<CartProduct> cartProducts)
+    public int calcCartTotal(List<CartProduct> cartProducts)
     {
         int totalCart = 0;
         for(CartProduct cartProduct: cartProducts) {
@@ -90,11 +95,10 @@ public class CartServiceImp implements CartService {
     }
 
     @Override
-    public GenericResponse<Object> emptyCart() {
-        String email =SecurityContextHolder.getContext().getAuthentication().getName();
+    public GenericResponse<Object> emptyCart(String email) {
 
         Cart cart = cartRepository.findByEmail(email).orElseThrow(
-                ()-> new UsernameNotFoundException("User not found")
+                ()-> new CartNotFoudException()
         );
 
         boolean isEmpty = (cartProductRepository.deleteByCart(cart) == 0)
@@ -102,7 +106,7 @@ public class CartServiceImp implements CartService {
         : true;
 
         if(! isEmpty) {
-            throw new EmptyCartException();
+            throw new EmptyCartException("Something happened to empty cart");
         }
 
         return GenericResponse.builder()
@@ -110,4 +114,26 @@ public class CartServiceImp implements CartService {
                 .data(null)
                 .build();
     }
+
+    @Override
+    public CartResponse deleteById(String email, Integer productId) {
+
+        Product product = productRepository.findById(productId).orElseThrow(
+                ()-> new ProductNotFoundException(productId)
+        );
+
+        User user = userRepository.findByEmail(email).orElseThrow(
+                ()-> new UsernameNotFoundException("User not found")
+        );
+
+        CartProduct productInCart = cartProductRepository.findByCartAndProduct(user.getCart(), product).orElseThrow(
+                ()-> new ProductNotFoundException(productId)
+        );
+
+        cartProductRepository.delete(productInCart);
+
+        return cartProductMapper.toResponse(productInCart);
+    }
+
+
 }

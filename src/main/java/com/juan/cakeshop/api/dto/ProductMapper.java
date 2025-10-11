@@ -16,7 +16,7 @@ public class ProductMapper {
                 .name(productDto.getName())
                 .description(productDto.getDescription())
                 .price(productDto.getPrice())
-                .quant(productDto.getCant())
+                .quant(productDto.getQuant())
                 .build();
     }
 
@@ -26,7 +26,7 @@ public class ProductMapper {
                 .productId(product.getProductId())
                 .name(product.getName())
                 .price(product.getPrice())
-                .cant(product.getQuant())
+                .quant(product.getQuant())
                 .categoryName(product.getCategory().getName())
                 .score(product.getScore())
                 .imgUrl(product.getImg())
@@ -44,6 +44,6 @@ public class ProductMapper {
         savedProduct.setName(productDto.getName());
         savedProduct.setPrice(productDto.getPrice());
         savedProduct.setDescription(productDto.getDescription());
-        savedProduct.setQuant(productDto.getCant());
+        savedProduct.setQuant(productDto.getQuant());
     }
 }

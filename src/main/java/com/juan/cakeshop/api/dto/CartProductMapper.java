@@ -15,7 +15,6 @@ public class CartProductMapper {
         return CartProduct.builder()
                 .product(product)
                 .cart(cart)
-                .quant(cartDto.getQuant())
                 .build();
     }
 

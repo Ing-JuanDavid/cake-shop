@@ -4,6 +4,7 @@ import com.juan.cakeshop.api.dto.requests.CategoryDto;
 import com.juan.cakeshop.api.dto.responses.CategoryResponse;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.api.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,9 +19,11 @@ public class CategoryController {
 
     final CategoryService categoryService;
 
-    @PostMapping("/create")
+    @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GenericResponse<CategoryResponse>> createCategory(CategoryDto categoryDto)
+    public ResponseEntity<GenericResponse<CategoryResponse>> createCategory(
+            @RequestBody @Valid CategoryDto categoryDto
+    )
     {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
                 .message("ok")
@@ -46,11 +49,11 @@ public class CategoryController {
                 .build());
     }
 
-    @PutMapping("/update/{categoryId}")
+    @PutMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse<CategoryResponse>> updateCategory(
             @PathVariable int categoryId,
-            @RequestBody CategoryDto categoryDto
+            @RequestBody @Valid CategoryDto categoryDto
     )
     {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
@@ -61,7 +64,7 @@ public class CategoryController {
 
     // Delete category ...
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("delete/{categoryId}")
+    @DeleteMapping("/{categoryId}")
     public ResponseEntity<GenericResponse<CategoryResponse>> deleteCategory(@PathVariable  int categoryId)
     {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()

@@ -10,10 +10,12 @@ import com.juan.cakeshop.api.repository.ProductRepository;
 import com.juan.cakeshop.api.repository.RateRepository;
 import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.api.service.RateService;
+import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
+import com.juan.cakeshop.exception.customExceptions.ProductMatchException;
 import com.juan.cakeshop.exception.customExceptions.ProductNotFoundException;
 import com.juan.cakeshop.exception.customExceptions.RateNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -29,12 +31,13 @@ public class RateServiceImp implements RateService {
     private final RateMapper rateMapper;
 
     @Override
-    public RateResponse createRate(int productId, RateDto rateDto) {
+    public RateResponse createRate(String email, int productId, RateDto rateDto) {
+
+        if(rateDto.getScore() < 0 || rateDto.getScore() > 5) throw  new InvalidInputException("score");
+
         Product product = productRepository.findById(productId).orElseThrow(
                 ()-> new ProductNotFoundException(productId)
         );
-
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByEmail(email).orElseThrow(
                 ()->  new UsernameNotFoundException("User not found")
@@ -54,13 +57,10 @@ public class RateServiceImp implements RateService {
     }
 
     @Override
-    public RateResponse updateRate(int productId, int rateId, RateDto rateDto) {
-        User user = userRepository.findByEmail(
-                SecurityContextHolder.getContext().getAuthentication().getName()
-        ).orElseThrow(
+    public RateResponse updateRate(String email, int productId, int rateId, RateDto rateDto) {
+        User user = userRepository.findByEmail(email).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
         );
-
 
         Rate savedRate = rateRepository.findByUserAndRateId(user, rateId).orElseThrow(
                 ()-> new RateNotFoundException(rateId)
@@ -69,7 +69,7 @@ public class RateServiceImp implements RateService {
         Product savedProduct = savedRate.getProduct();
 
         if(! savedProduct.getProductId().equals(productId)) {
-            throw  new RateNotFoundException(rateId); //  must change this exception to productMisMatchException
+            throw  new ProductMatchException(productId);
         }
 
         savedRate = rateMapper.updateFromRateDto(savedRate, rateDto);
@@ -80,24 +80,27 @@ public class RateServiceImp implements RateService {
     }
 
     @Override
-    public RateResponse deleteRate(int rateId) {
+    public RateResponse deleteRate(Authentication authentication, int rateId) {
 
-        User user = userRepository.findByEmail(
-                SecurityContextHolder.getContext().getAuthentication().getName()
-        ).orElseThrow(
+        if(authentication.getAuthorities().stream()
+                .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))
+        ){
+            return rateMapper.toResponse(this.deleteRateByAdmin(rateId));
+        }
+
+        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
         );
 
         Rate rate = rateRepository.findByUserAndRateId(user, rateId).orElseThrow(
                 ()-> new RateNotFoundException(rateId)
         );
-
         rateRepository.delete(rate);
 
         return rateMapper.toResponse(rate);
     }
 
-    public RateResponse deleteRateByAdmin(int rateId)
+    public Rate deleteRateByAdmin(int rateId)
     {
         Rate savedRate = rateRepository.findById(rateId).orElseThrow(
                 ()-> new RateNotFoundException(rateId)
@@ -105,7 +108,7 @@ public class RateServiceImp implements RateService {
 
         rateRepository.delete(savedRate);
 
-        return rateMapper.toResponse(savedRate);
+        return savedRate;
     }
 
 }

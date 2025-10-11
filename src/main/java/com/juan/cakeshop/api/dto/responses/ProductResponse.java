@@ -9,7 +9,7 @@ public class ProductResponse {
     private Integer productId;
     private String name;
     private Integer price;
-    private Integer cant;
+    private Integer quant;
     private String categoryName;
     private Float score;
     private String imgUrl;

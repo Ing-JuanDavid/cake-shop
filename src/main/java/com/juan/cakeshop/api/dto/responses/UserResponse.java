@@ -1,19 +1,19 @@
-package com.juan.cakeshop.auth.dto;
+package com.juan.cakeshop.api.dto.responses;
 
+import com.juan.cakeshop.api.model.Rol;
 import lombok.Builder;
 import lombok.Data;
 
-
 import java.time.LocalDate;
 
-@Builder
 @Data
-public class RegisterRequest {
+@Builder
+public class UserResponse {
+    private Long nip;
     private String email;
-    private String password;
     private String name;
     private LocalDate birth;
-    private Long nip;
+    private Rol rol;
     private String sex;
     private String address;
     private String telf;
