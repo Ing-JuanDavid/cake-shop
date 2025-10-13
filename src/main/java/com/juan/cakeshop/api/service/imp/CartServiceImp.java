@@ -101,13 +101,11 @@ public class CartServiceImp implements CartService {
                 ()-> new CartNotFoudException()
         );
 
-        boolean isEmpty = (cartProductRepository.deleteByCart(cart) == 0)
-        ? false
-        : true;
+        List<CartProduct> cartProducts = cart.getCartProduct();
 
-        if(! isEmpty) {
-            throw new EmptyCartException("Something happened to empty cart");
-        }
+        if(cartProducts.isEmpty()) throw new EmptyCartException("Your cart already is empty");
+
+        cartProductRepository.deleteByCart(cart);
 
         return GenericResponse.builder()
                 .message("ok")
@@ -126,11 +124,18 @@ public class CartServiceImp implements CartService {
                 ()-> new UsernameNotFoundException("User not found")
         );
 
-        CartProduct productInCart = cartProductRepository.findByCartAndProduct(user.getCart(), product).orElseThrow(
-                ()-> new ProductNotFoundException(productId)
-        );
+        Cart cart = user.getCart();
 
-        cartProductRepository.delete(productInCart);
+        if(cart.getCartProduct().isEmpty()) throw new EmptyCartException("Your cart already is empty");
+
+        CartProduct productInCart = cart.getCartProduct().stream()
+                        .filter(cp -> cp.getProduct().equals(product))
+                        .findFirst()
+                        .orElseThrow(()->new ProductNotFoundException(productId));
+
+        cart.getCartProduct().remove(productInCart);
+
+        cartRepository.save(cart);
 
         return cartProductMapper.toResponse(productInCart);
     }

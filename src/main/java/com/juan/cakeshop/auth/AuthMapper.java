@@ -2,7 +2,7 @@ package com.juan.cakeshop.auth;
 
 import com.juan.cakeshop.api.model.Rol;
 import com.juan.cakeshop.api.model.User;
-import com.juan.cakeshop.auth.dto.UserDto;
+import com.juan.cakeshop.auth.dto.AuthDto;
 import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
 import com.juan.cakeshop.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserMapper {
+public class AuthMapper {
 
     final PasswordEncoder passwordEncoder;
     final JwtService jwtService;
 
-    public User toEntity(UserDto userDto)
+    public User toEntity(AuthDto userDto)
     {
         if(userDto.getEmail() == null || userDto.getEmail().isBlank()) throw new InvalidInputException("email");
 

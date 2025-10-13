@@ -4,6 +4,7 @@ import com.juan.cakeshop.api.dto.requests.RateDto;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.api.dto.responses.RateResponse;
 import com.juan.cakeshop.api.service.RateService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +25,7 @@ public class RateController {
     public ResponseEntity<GenericResponse<RateResponse>> createRate(
             @AuthenticationPrincipal String email,
             @PathVariable int productId,
-            @RequestBody RateDto rateDto)
+            @RequestBody @Valid RateDto rateDto)
     {
         return ResponseEntity.ok(GenericResponse.<RateResponse>builder()
                 .message("ok")
@@ -47,7 +48,7 @@ public class RateController {
             @AuthenticationPrincipal String email,
             @PathVariable int productId,
             @PathVariable int rateId,
-            @RequestBody  RateDto rateDto)
+            @RequestBody @Valid RateDto rateDto)
     {
         return ResponseEntity.ok(GenericResponse.<RateResponse>builder()
                 .message("ok")

@@ -4,7 +4,7 @@ import com.juan.cakeshop.api.model.User;
 import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.auth.dto.LoginRequest;
 import com.juan.cakeshop.auth.dto.PasswordRequest;
-import com.juan.cakeshop.auth.dto.UserDto;
+import com.juan.cakeshop.auth.dto.AuthDto;
 import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
 import com.juan.cakeshop.exception.customExceptions.UserAlreadyExistException;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +24,9 @@ public class AuthService {
     final PasswordEncoder passwordEncoder;
     final UserRepository userRepository;
     final UserDetailsService userDetailsService;
-    final UserMapper userMapper;
+    final AuthMapper authMapper;
 
-    public AuthResponse register(UserDto userDto)
+    public AuthResponse register(AuthDto userDto)
     {
         if(userRepository.existsByEmail(userDto.getEmail()))
             throw new UserAlreadyExistException("email", userDto.getEmail());
@@ -34,10 +34,10 @@ public class AuthService {
         if(userRepository.existsByNip(userDto.getNip()))
             throw new UserAlreadyExistException("NIP", String.valueOf(userDto.getNip()));
 
-        User user = userMapper.toEntity(userDto);
+        User user = authMapper.toEntity(userDto);
 
         userRepository.save(user);
-        return userMapper.toResponse(user);
+        return authMapper.toResponse(user);
     }
 
     public AuthResponse login(LoginRequest request)
@@ -48,7 +48,7 @@ public class AuthService {
 
         UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
 
-        return userMapper.toResponse(user);
+        return authMapper.toResponse(user);
     }
 
     public AuthResponse changePassword(PasswordRequest request)
@@ -66,6 +66,6 @@ public class AuthService {
 
         User updatedUser = userRepository.save(user);
 
-        return userMapper.toResponse(updatedUser);
+        return authMapper.toResponse(updatedUser);
     }
 }

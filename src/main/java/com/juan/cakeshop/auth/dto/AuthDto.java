@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Builder
 @Data
-public class UserDto {
+public class AuthDto {
     @NotBlank(message = "email can't be empty")
     @Email(message = "format is invalid")
     private String email;

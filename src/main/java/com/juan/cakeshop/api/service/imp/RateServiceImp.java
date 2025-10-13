@@ -10,8 +10,6 @@ import com.juan.cakeshop.api.repository.ProductRepository;
 import com.juan.cakeshop.api.repository.RateRepository;
 import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.api.service.RateService;
-import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
-import com.juan.cakeshop.exception.customExceptions.ProductMatchException;
 import com.juan.cakeshop.exception.customExceptions.ProductNotFoundException;
 import com.juan.cakeshop.exception.customExceptions.RateNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +30,6 @@ public class RateServiceImp implements RateService {
 
     @Override
     public RateResponse createRate(String email, int productId, RateDto rateDto) {
-
-        if(rateDto.getScore() < 0 || rateDto.getScore() > 5) throw  new InvalidInputException("score");
-
         Product product = productRepository.findById(productId).orElseThrow(
                 ()-> new ProductNotFoundException(productId)
         );
@@ -62,15 +57,10 @@ public class RateServiceImp implements RateService {
                 ()-> new UsernameNotFoundException("User not found")
         );
 
-        Rate savedRate = rateRepository.findByUserAndRateId(user, rateId).orElseThrow(
-                ()-> new RateNotFoundException(rateId)
-        );
-
-        Product savedProduct = savedRate.getProduct();
-
-        if(! savedProduct.getProductId().equals(productId)) {
-            throw  new ProductMatchException(productId);
-        }
+        Rate savedRate = user.getRates().stream()
+                .filter(rate -> rate.getRateId() == rateId && rate.getProduct().getProductId() == productId)
+                .findFirst()
+                .orElseThrow(()-> new RateNotFoundException(rateId));
 
         savedRate = rateMapper.updateFromRateDto(savedRate, rateDto);
 
