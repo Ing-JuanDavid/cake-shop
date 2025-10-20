@@ -1,4 +1,4 @@
-package com.juan.cakeshop.api.dto;
+package com.juan.cakeshop.api.mapper;
 
 import com.juan.cakeshop.api.dto.requests.RateDto;
 import com.juan.cakeshop.api.dto.responses.RateResponse;
@@ -8,7 +8,6 @@ import com.juan.cakeshop.api.model.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 

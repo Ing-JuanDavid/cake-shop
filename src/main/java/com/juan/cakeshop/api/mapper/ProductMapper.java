@@ -1,4 +1,4 @@
-package com.juan.cakeshop.api.dto;
+package com.juan.cakeshop.api.mapper;
 
 import com.juan.cakeshop.api.dto.requests.ProductDto;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;

@@ -1,11 +1,11 @@
-package com.juan.cakeshop.auth.dto;
+package com.juan.cakeshop.api.dto.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class LoginRequest {
+public class LoginDto {
     @NotBlank
     @Email(message = "Format is invalid")
     private String email;

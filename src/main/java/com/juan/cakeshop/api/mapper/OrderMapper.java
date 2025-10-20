@@ -1,10 +1,10 @@
-package com.juan.cakeshop.api.dto;
+package com.juan.cakeshop.api.mapper;
 
+import com.juan.cakeshop.api.dto.OrderStatus;
 import com.juan.cakeshop.api.dto.responses.OrderResponse;
 import com.juan.cakeshop.api.dto.responses.UpdatedOrderResponse;
 import com.juan.cakeshop.api.model.CartProduct;
 import com.juan.cakeshop.api.model.Order;
-import com.juan.cakeshop.api.model.OrderProduct;
 import com.juan.cakeshop.api.model.User;
 import com.juan.cakeshop.api.service.CartService;
 import lombok.RequiredArgsConstructor;

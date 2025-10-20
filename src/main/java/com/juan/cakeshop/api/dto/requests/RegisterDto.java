@@ -1,4 +1,4 @@
-package com.juan.cakeshop.auth.dto;
+package com.juan.cakeshop.api.dto.requests;
 
 import jakarta.validation.constraints.*;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Builder
 @Data
-public class AuthDto {
+public class RegisterDto {
     @NotBlank(message = "email can't be empty")
     @Email(message = "format is invalid")
     private String email;

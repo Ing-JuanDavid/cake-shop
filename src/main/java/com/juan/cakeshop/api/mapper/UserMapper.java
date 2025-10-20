@@ -1,9 +1,9 @@
-package com.juan.cakeshop.api.dto;
+package com.juan.cakeshop.api.mapper;
 
+import com.juan.cakeshop.api.dto.requests.RegisterDto;
 import com.juan.cakeshop.api.dto.requests.UserInfoDto;
 import com.juan.cakeshop.api.dto.responses.UserResponse;
 import com.juan.cakeshop.api.model.User;
-import com.juan.cakeshop.auth.dto.AuthDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,16 +25,16 @@ public class UserMapper {
                 .build();
     }
 
-    public User toEntity(AuthDto userDto)
+    public User toEntity(RegisterDto registerDto)
     {
         return User.builder()
-                .nip(userDto.getNip())
-                .email(userDto.getEmail())
-                .name(userDto.getName())
-                .telf(userDto.getTelf())
-                .address(userDto.getAddress())
-                .sex(userDto.getSex())
-                .birth(userDto.getBirth())
+                .nip(registerDto.getNip())
+                .email(registerDto.getEmail())
+                .name(registerDto.getName())
+                .telf(registerDto.getTelf())
+                .address(registerDto.getAddress())
+                .sex(registerDto.getSex())
+                .birth(registerDto.getBirth())
                 .build();
     }
 

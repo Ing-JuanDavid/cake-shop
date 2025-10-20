@@ -1,4 +1,4 @@
-package com.juan.cakeshop.auth;
+package com.juan.cakeshop.api.dto.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

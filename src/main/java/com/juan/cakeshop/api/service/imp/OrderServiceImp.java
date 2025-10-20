@@ -1,6 +1,6 @@
 package com.juan.cakeshop.api.service.imp;
 
-import com.juan.cakeshop.api.dto.OrderMapper;
+import com.juan.cakeshop.api.mapper.OrderMapper;
 import com.juan.cakeshop.api.dto.requests.OrderDto;
 import com.juan.cakeshop.api.dto.responses.OrderResponse;
 import com.juan.cakeshop.api.dto.responses.UpdatedOrderResponse;
