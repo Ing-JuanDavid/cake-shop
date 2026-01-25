@@ -26,7 +26,7 @@ public class UserController {
     public ResponseEntity<GenericResponse<List<UserResponse>>> getUsers()
     {
         return ResponseEntity.ok(GenericResponse.<List<UserResponse>>builder()
-                .message("ok")
+                .ok(true)
                 .data(userService.getUsers())
                 .build());
     }
@@ -36,7 +36,7 @@ public class UserController {
     public ResponseEntity<GenericResponse<UserResponse>> getUser(@PathVariable Long nip)
     {
         return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(userService.findUser(nip))
                 .build());
     }
@@ -48,7 +48,7 @@ public class UserController {
             @RequestBody @Valid UserDto userDto)
     {
         return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(userService.updateUser(nip, userDto))
                 .build());
     }
@@ -60,7 +60,7 @@ public class UserController {
             @RequestBody @Valid UserInfoDto userInfoDto)
     {
         return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(userService.updateUser(email, userInfoDto))
                 .build());
     }
@@ -70,7 +70,7 @@ public class UserController {
     public ResponseEntity<GenericResponse<UserResponse>> deleteUser(@PathVariable Long nip)
     {
         return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(userService.deleteUserByNip(nip))
                 .build());
     }

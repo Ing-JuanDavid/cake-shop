@@ -26,7 +26,7 @@ public class CategoryController {
     )
     {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(categoryService.createCategory(categoryDto))
                 .build());
     }
@@ -35,7 +35,7 @@ public class CategoryController {
     public ResponseEntity<GenericResponse<List<CategoryResponse>>> getAllCategories()
     {
         return ResponseEntity.ok(GenericResponse.<List<CategoryResponse>>builder()
-                .message("ok")
+                .ok(true)
                 .data(categoryService.getAllCategories())
                 .build());
     }
@@ -44,7 +44,7 @@ public class CategoryController {
     public ResponseEntity<GenericResponse<CategoryResponse>> getCategory(@PathVariable int categoryId)
     {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(categoryService.getCategory(categoryId))
                 .build());
     }
@@ -57,7 +57,7 @@ public class CategoryController {
     )
     {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(categoryService.updateCategory(categoryId, categoryDto))
                 .build());
     }
@@ -68,7 +68,7 @@ public class CategoryController {
     public ResponseEntity<GenericResponse<CategoryResponse>> deleteCategory(@PathVariable  int categoryId)
     {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(categoryService.deleteCategory(categoryId))
                 .build());
     }

@@ -4,6 +4,7 @@ import com.juan.cakeshop.api.mapper.OrderMapper;
 import com.juan.cakeshop.api.dto.requests.OrderDto;
 import com.juan.cakeshop.api.dto.responses.OrderResponse;
 import com.juan.cakeshop.api.dto.responses.UpdatedOrderResponse;
+import com.juan.cakeshop.api.mapper.ProductMapper;
 import com.juan.cakeshop.api.model.*;
 import com.juan.cakeshop.api.repository.CartRepository;
 import com.juan.cakeshop.api.repository.OrderRepository;
@@ -11,11 +12,14 @@ import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.api.service.OrderService;
 import com.juan.cakeshop.exception.customExceptions.EmptyCartException;
 import com.juan.cakeshop.exception.customExceptions.OrderNotFound;
+import com.juan.cakeshop.exception.customExceptions.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ public class OrderServiceImp implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final CartRepository cartRepository;
+    private final ProductMapper productMapper;
 
     @Override
     public OrderResponse CreateOrder(String email) {
@@ -53,6 +58,24 @@ public class OrderServiceImp implements OrderService {
         );
 
         return orderMapper.toList(user.getOrders());
+    }
+
+    @Override
+    public List<OrderResponse> getOrdersByProductId(String email, int productId) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                ()-> new UsernameNotFoundException("User not found")
+        );
+
+        List<Order> orders = user.getOrders().stream()
+                .filter(order -> order.getOrderProducts().stream()
+                        .anyMatch(orderProduct -> orderProduct.getProduct().getProductId()==productId))
+                .toList();
+
+
+
+        if(orders.isEmpty()) throw new ProductNotFoundException(productId); //change this line
+
+        return orderMapper.toList(orders);
     }
 
     @Override

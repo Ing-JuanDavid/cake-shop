@@ -90,6 +90,20 @@ public class RateServiceImp implements RateService {
         return rateMapper.toResponse(rate);
     }
 
+    @Override
+    public RateResponse getRateByUser(int productId, String email) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                ()->new ProductNotFoundException(productId)
+        );
+
+        List<Rate> productRates = product.getRates();
+
+        Rate rate = productRates.stream()
+                .filter(r-> r.getUser().getEmail().equals(email)
+                ).findFirst().orElseThrow(()-> new RateNotFoundException(productId));
+        return rateMapper.toResponse(rate);
+    }
+
     public Rate deleteRateByAdmin(int rateId)
     {
         Rate savedRate = rateRepository.findById(rateId).orElseThrow(

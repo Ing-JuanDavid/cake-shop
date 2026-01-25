@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/orders")
 public class OrderController {
 
@@ -27,7 +28,7 @@ public class OrderController {
     )
     {
         return ResponseEntity.ok(GenericResponse.<OrderResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(orderService.CreateOrder(email))
                 .build());
     }
@@ -39,8 +40,21 @@ public class OrderController {
     )
     {
         return ResponseEntity.ok(GenericResponse.<List<OrderResponse>>builder()
-                .message("ok")
+                .ok(true)
                 .data(orderService.getALlOrders(email))
+                .build());
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<GenericResponse<List<OrderResponse>>> getOrdersByProductId(
+            @AuthenticationPrincipal String email,
+            @PathVariable int productId
+    )
+    {
+        return ResponseEntity.ok(GenericResponse.<List<OrderResponse>>builder()
+                .ok(true)
+                .data(orderService.getOrdersByProductId(email, productId))
                 .build());
     }
 
@@ -52,7 +66,7 @@ public class OrderController {
     )
     {
         return ResponseEntity.ok(GenericResponse.<UpdatedOrderResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(orderService.updateStatus(orderId, orderDto))
                 .build());
     }

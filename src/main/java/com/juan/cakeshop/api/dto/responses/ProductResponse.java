@@ -10,7 +10,9 @@ public class ProductResponse {
     private String name;
     private Integer price;
     private Integer quant;
+    private String description;
     private String categoryName;
     private Float score;
     private String imgUrl;
+    private Integer rateNumber;
 }

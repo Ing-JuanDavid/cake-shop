@@ -1,5 +1,6 @@
 package com.juan.cakeshop.exception;
 
+import com.juan.cakeshop.api.dto.responses.FieldErrorsResponse;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.exception.customExceptions.BusinessException;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(GenericResponse.builder()
-                        .message("error")
+                        .ok(false)
                         .error(ex.getMessage())
                         .build());
     }
@@ -34,27 +35,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(GenericResponse.builder()
-                        .message("error")
+                        .ok(false)
                         .error(ex.getMessage())
                         .build());
     }
 
     // Handle validations errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex)
+    public ResponseEntity<FieldErrorsResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex)
     {
-        Map<String, String> errors = new HashMap<>();
+        Map<String, String> fieldErrors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
-                error -> errors.put(error.getField(), error.getDefaultMessage())
+                error -> fieldErrors.put(error.getField(), error.getDefaultMessage())
         );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of(
-                        "message", "error",
-                        "error", errors
-                ));
+                .body(FieldErrorsResponse.builder()
+                        .ok(false)
+                        .error("Invalid fields")
+                        .fieldErrors(fieldErrors)
+                        .build());
     }
 
     // Handle business errors
@@ -63,7 +65,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(ex.getStatus())
                 .body(GenericResponse.builder()
-                        .message("error")
+                        .ok(false)
                         .error(ex.getMessage())
                         .build());
     }
@@ -73,7 +75,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(ex.getStatusCode())
                 .body(GenericResponse.builder()
-                        .message("error")
+                        .ok(false)
                         .error(ex.getReason())
                         .build());
     }
@@ -86,7 +88,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(GenericResponse.<Object>builder()
-                        .message("error")
+                        .ok(false)
                         .error("Unexpected value")
                         .build());
     }
@@ -97,7 +99,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(GenericResponse.builder()
-                        .message("error")
+                        .ok(false)
                         .error("Unexpected error: " + ex.getCause())
                         .build());
     }

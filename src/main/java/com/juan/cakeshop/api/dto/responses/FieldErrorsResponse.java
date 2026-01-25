@@ -2,12 +2,12 @@ package com.juan.cakeshop.api.dto.responses;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
+import java.util.Map;
 
 @Data
 @Builder
-public class GenericResponse<T> {
+public class FieldErrorsResponse {
     private boolean ok;
-    private T data;
     private String error;
+    private Map<String, String> fieldErrors;
 }

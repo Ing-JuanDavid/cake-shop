@@ -19,10 +19,14 @@ public class CartProductMapper {
     }
 
     public CartResponse toResponse(CartProduct cartProduct) {
+
+        Product product = cartProduct.getProduct();
         return CartResponse.builder()
+                .productId(product.getProductId())
                 .productName(cartProduct.getProduct().getName())
                 .price(cartProduct.getProduct().getPrice())
                 .quant(cartProduct.getQuant())
+                .img(product.getImg())
                 .build();
     }
 

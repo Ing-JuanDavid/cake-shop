@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProductController {
 
     final ProductService productService;
@@ -27,7 +28,7 @@ public class ProductController {
     ) {
         ProductResponse productResponse = productService.createProduct(productDto);
         return ResponseEntity.ok(GenericResponse.<ProductResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(productResponse)
                 .build());
     }
@@ -36,7 +37,7 @@ public class ProductController {
     public ResponseEntity<GenericResponse<List<ProductResponse>>> getAllProducts()
     {
         return ResponseEntity.ok(GenericResponse.<List<ProductResponse>>builder()
-                .message("ok")
+                .ok(true)
                 .data(productService.getAllProducts())
                 .build());
     }
@@ -45,7 +46,7 @@ public class ProductController {
     public ResponseEntity<GenericResponse<ProductResponse>> getProduct(@PathVariable int productId)
     {
         return ResponseEntity.ok(GenericResponse.<ProductResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(productService.getProduct(productId))
                 .build());
     }
@@ -60,7 +61,7 @@ public class ProductController {
         ProductResponse productResponse = productService.updateProduct(productId, productDto);
 
         return ResponseEntity.ok(GenericResponse.<ProductResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(productResponse)
                 .build());
     }
@@ -71,7 +72,7 @@ public class ProductController {
     {
         ProductResponse productResponse = productService.deleteProduct(productId);
         return ResponseEntity.ok(GenericResponse.<ProductResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(productResponse)
                 .build());
     }

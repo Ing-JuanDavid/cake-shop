@@ -16,4 +16,6 @@ public interface RateService {
     RateResponse updateRate(String email, int productId, int rateId, RateDto rateDto);
 
     RateResponse deleteRate(Authentication authentication, int rateId);
+
+    RateResponse getRateByUser(int productId, String email);
 }

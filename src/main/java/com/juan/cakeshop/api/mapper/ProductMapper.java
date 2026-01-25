@@ -22,14 +22,19 @@ public class ProductMapper {
 
     public ProductResponse toResponse(Product product)
     {
+
+        int rateNumber = product.getRates().size();
+
         return ProductResponse.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .quant(product.getQuant())
+                .description(product.getDescription())
                 .categoryName(product.getCategory().getName())
                 .score(product.getScore())
                 .imgUrl(product.getImg())
+                .rateNumber(rateNumber)
                 .build();
     }
 

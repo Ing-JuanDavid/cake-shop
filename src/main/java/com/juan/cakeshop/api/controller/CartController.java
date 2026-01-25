@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/cart")
 public class CartController {
 
@@ -28,7 +30,7 @@ public class CartController {
     )
     {
         return ResponseEntity.ok(GenericResponse.<CartResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(cartService.addProduct(email, cartDto))
                 .build());
     }
@@ -40,7 +42,7 @@ public class CartController {
     )
     {
         return ResponseEntity.ok(GenericResponse.<Map<String, Object>>builder()
-                .message("ok")
+                .ok(true)
                 .data(cartService.getCart(email))
                 .build());
     }
@@ -54,7 +56,7 @@ public class CartController {
     )
     {
         return ResponseEntity.ok(GenericResponse.<CartResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(cartService.deleteById(email, productId))
                 .build());
     }

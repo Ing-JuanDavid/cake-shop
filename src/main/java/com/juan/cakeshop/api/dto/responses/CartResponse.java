@@ -6,7 +6,9 @@ import lombok.Data;
 @Data
 @Builder
 public class CartResponse {
+    private int productId;
     private String productName;
     private int price;
     private int quant;
+    private String img;
 }

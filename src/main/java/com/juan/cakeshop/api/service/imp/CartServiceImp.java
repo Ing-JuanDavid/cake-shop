@@ -108,7 +108,7 @@ public class CartServiceImp implements CartService {
         cartProductRepository.deleteByCart(cart);
 
         return GenericResponse.builder()
-                .message("ok")
+                .ok(true)
                 .data(null)
                 .build();
     }

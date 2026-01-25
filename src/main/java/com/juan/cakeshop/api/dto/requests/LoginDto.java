@@ -6,9 +6,9 @@ import lombok.Data;
 
 @Data
 public class LoginDto {
-    @NotBlank
+    @NotBlank(message = "Email can't empty")
     @Email(message = "Format is invalid")
     private String email;
-    @NotBlank
+    @NotBlank(message = "Password can't empty")
     private String password;
 }

@@ -16,19 +16,22 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
+
 public class RateController {
 
     private final RateService rateService;
 
     @PostMapping("/products/{productId}/rates")
     @PreAuthorize("hasRole('USER')")
+
     public ResponseEntity<GenericResponse<RateResponse>> createRate(
             @AuthenticationPrincipal String email,
             @PathVariable int productId,
             @RequestBody @Valid RateDto rateDto)
     {
         return ResponseEntity.ok(GenericResponse.<RateResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(rateService.createRate(email, productId, rateDto))
                 .build());
     }
@@ -37,7 +40,7 @@ public class RateController {
     public ResponseEntity<GenericResponse<List<RateResponse>>> getRatesByProduct(@PathVariable int productId)
     {
         return ResponseEntity.ok(GenericResponse.<List<RateResponse>>builder()
-                .message("ok")
+                .ok(true)
                 .data(rateService.getRatesByProduct(productId))
                 .build());
     }
@@ -51,7 +54,7 @@ public class RateController {
             @RequestBody @Valid RateDto rateDto)
     {
         return ResponseEntity.ok(GenericResponse.<RateResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(rateService.updateRate(email, productId, rateId, rateDto))
                 .build());
     }
@@ -64,9 +67,21 @@ public class RateController {
     )
     {
         return ResponseEntity.ok(GenericResponse.<RateResponse>builder()
-                .message("ok")
+                .ok(true)
                 .data(rateService.deleteRate(authentication,  rateId))
                 .build());
+    }
+
+    @GetMapping("/products/{productId}/rate")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<GenericResponse<RateResponse>>getRateByUser(
+            @PathVariable int productId,
+            @AuthenticationPrincipal String email
+    ){
+      return ResponseEntity.ok(GenericResponse.<RateResponse>builder()
+              .ok(true)
+              .data(rateService.getRateByUser(productId, email))
+              .build());
     }
 
 }

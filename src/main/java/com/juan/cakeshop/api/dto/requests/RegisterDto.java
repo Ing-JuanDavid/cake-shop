@@ -18,6 +18,7 @@ public class RegisterDto {
     @NotBlank(message = "name can't be empty")
     private String name;
     @Past(message = "date birth must be in the past")
+    @NotNull(message = "date is required")
     private LocalDate birth;
     @NotNull(message = "nip is required")
     private Long nip;
