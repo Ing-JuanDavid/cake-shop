@@ -26,6 +26,7 @@ public class CartProductMapper {
                 .productName(cartProduct.getProduct().getName())
                 .price(cartProduct.getProduct().getPrice())
                 .quant(cartProduct.getQuant())
+                .stock(product.getQuant())
                 .img(product.getImg())
                 .build();
     }

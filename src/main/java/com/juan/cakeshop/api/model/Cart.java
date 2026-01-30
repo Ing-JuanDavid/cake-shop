@@ -23,6 +23,7 @@ public class Cart {
     @JoinColumn(name="nip", nullable = false)
     private User user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<CartProduct> cartProduct = new ArrayList<>();
 }

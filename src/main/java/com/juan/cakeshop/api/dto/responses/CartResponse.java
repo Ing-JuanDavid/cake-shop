@@ -10,5 +10,6 @@ public class CartResponse {
     private String productName;
     private int price;
     private int quant;
+    private int stock;
     private String img;
 }
