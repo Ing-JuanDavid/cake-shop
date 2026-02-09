@@ -26,9 +26,11 @@ import java.util.List;
     {
         return orderProducts.stream()
                 .map(orderProduct -> CartResponse.builder()
-                        .productName(orderProduct.getProduct().getName())
+                        .productId(orderProduct.getProduct().getProductId())
+                        .name(orderProduct.getProduct().getName())
                         .price(orderProduct.getProduct().getPrice())
                         .quant(orderProduct.getQuant())
+                        .img(orderProduct.getProduct().getImg())
                         .build())
                 .toList();
     }

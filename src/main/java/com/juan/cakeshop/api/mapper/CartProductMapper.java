@@ -23,7 +23,7 @@ public class CartProductMapper {
         Product product = cartProduct.getProduct();
         return CartResponse.builder()
                 .productId(product.getProductId())
-                .productName(cartProduct.getProduct().getName())
+                .name(cartProduct.getProduct().getName())
                 .price(cartProduct.getProduct().getPrice())
                 .quant(cartProduct.getQuant())
                 .stock(product.getQuant())

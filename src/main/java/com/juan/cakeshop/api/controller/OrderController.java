@@ -4,6 +4,7 @@ import com.juan.cakeshop.api.dto.requests.OrderDto;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.api.dto.responses.OrderResponse;
 import com.juan.cakeshop.api.dto.responses.UpdatedOrderResponse;
+import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,37 +25,49 @@ public class OrderController {
     @PostMapping()
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GenericResponse<OrderResponse>> createOrder(
-            @AuthenticationPrincipal String email
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp
     )
     {
         return ResponseEntity.ok(GenericResponse.<OrderResponse>builder()
                 .ok(true)
-                .data(orderService.CreateOrder(email))
+                .data(orderService.CreateOrder(userDetailsImp.getUsername()))
                 .build());
     }
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GenericResponse<List<OrderResponse>>> getAllOrders(
-            @AuthenticationPrincipal String email
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp
     )
     {
         return ResponseEntity.ok(GenericResponse.<List<OrderResponse>>builder()
                 .ok(true)
-                .data(orderService.getALlOrders(email))
+                .data(orderService.getALlOrders(userDetailsImp.getUsername()))
                 .build());
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/{orderId}")
+    public ResponseEntity<GenericResponse<OrderResponse>> getOrderById(
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp,
+            @PathVariable int orderId)
+    {
+        return ResponseEntity.ok(GenericResponse.<OrderResponse>builder()
+                .ok(true)
+                .data(orderService.getOrderById(userDetailsImp.getUsername(), orderId))
+                .build()) ;
     }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/product/{productId}")
     public ResponseEntity<GenericResponse<List<OrderResponse>>> getOrdersByProductId(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp,
             @PathVariable int productId
     )
     {
         return ResponseEntity.ok(GenericResponse.<List<OrderResponse>>builder()
                 .ok(true)
-                .data(orderService.getOrdersByProductId(email, productId))
+                .data(orderService.getOrdersByProductId(userDetailsImp.getUsername(), productId))
                 .build());
     }
 

@@ -3,6 +3,7 @@ package com.juan.cakeshop.api.controller;
 import com.juan.cakeshop.api.dto.requests.RateDto;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.api.dto.responses.RateResponse;
+import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.service.RateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +27,13 @@ public class RateController {
     @PreAuthorize("hasRole('USER')")
 
     public ResponseEntity<GenericResponse<RateResponse>> createRate(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp,
             @PathVariable int productId,
             @RequestBody @Valid RateDto rateDto)
     {
         return ResponseEntity.ok(GenericResponse.<RateResponse>builder()
                 .ok(true)
-                .data(rateService.createRate(email, productId, rateDto))
+                .data(rateService.createRate(userDetailsImp.getUsername(), productId, rateDto))
                 .build());
     }
 
@@ -48,14 +49,14 @@ public class RateController {
     @PutMapping("/products/{productId}/rates/{rateId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GenericResponse<RateResponse>> updateRate(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp,
             @PathVariable int productId,
             @PathVariable int rateId,
             @RequestBody @Valid RateDto rateDto)
     {
         return ResponseEntity.ok(GenericResponse.<RateResponse>builder()
                 .ok(true)
-                .data(rateService.updateRate(email, productId, rateId, rateDto))
+                .data(rateService.updateRate(userDetailsImp.getUsername(), productId, rateId, rateDto))
                 .build());
     }
 
@@ -76,11 +77,11 @@ public class RateController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GenericResponse<RateResponse>>getRateByUser(
             @PathVariable int productId,
-            @AuthenticationPrincipal String email
+            @AuthenticationPrincipal UserDetailsImp userDetailsImpemail
     ){
       return ResponseEntity.ok(GenericResponse.<RateResponse>builder()
               .ok(true)
-              .data(rateService.getRateByUser(productId, email))
+              .data(rateService.getRateByUser(productId, userDetailsImpemail.getUsername()))
               .build());
     }
 

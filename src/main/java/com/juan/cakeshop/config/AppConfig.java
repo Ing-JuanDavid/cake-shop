@@ -1,5 +1,7 @@
 package com.juan.cakeshop.config;
 
+import com.juan.cakeshop.api.model.User;
+import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -40,8 +42,14 @@ public class AppConfig {
 
     @Bean
     public UserDetailsService getUserDetails() {
-        return email -> userRepo.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("User not found"));
+        return
+                email ->{
+                    User user = userRepo.findByEmail(email).orElseThrow(
+                            ()->new UsernameNotFoundException("User not found")
+                    );
+
+                    return new UserDetailsImp(user);
+                };
     }
 
 }

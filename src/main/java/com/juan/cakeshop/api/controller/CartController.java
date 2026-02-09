@@ -3,6 +3,7 @@ package com.juan.cakeshop.api.controller;
 import com.juan.cakeshop.api.dto.requests.CartDto;
 import com.juan.cakeshop.api.dto.responses.CartResponse;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
+import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.service.CartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,25 +26,25 @@ public class CartController {
     @PostMapping()
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GenericResponse<CartResponse>> addProduct(
-            @AuthenticationPrincipal String email, //if my principal were an object i could use an expression to indicate which attribute to use
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp, //if my principal were an object i could use an expression to indicate which attribute to use
             @RequestBody @Valid CartDto cartDto
     )
     {
         return ResponseEntity.ok(GenericResponse.<CartResponse>builder()
                 .ok(true)
-                .data(cartService.addProduct(email, cartDto))
+                .data(cartService.addProduct(userDetailsImp.getUsername(), cartDto))
                 .build());
     }
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public  ResponseEntity<GenericResponse<Map<String, Object>>> getCart(
-            @AuthenticationPrincipal String email
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp
     )
     {
         return ResponseEntity.ok(GenericResponse.<Map<String, Object>>builder()
                 .ok(true)
-                .data(cartService.getCart(email))
+                .data(cartService.getCart(userDetailsImp.getUsername()))
                 .build());
     }
 
@@ -51,23 +52,23 @@ public class CartController {
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GenericResponse<CartResponse>> deleteProduct(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp,
             @PathVariable  Integer productId
     )
     {
         return ResponseEntity.ok(GenericResponse.<CartResponse>builder()
                 .ok(true)
-                .data(cartService.deleteById(email, productId))
+                .data(cartService.deleteById(userDetailsImp.getUsername(), productId))
                 .build());
     }
 
     @DeleteMapping()
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GenericResponse<Object>> emptyCart(
-            @AuthenticationPrincipal String email
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp
     )
     {
-        return ResponseEntity.ok(cartService.emptyCart(email));
+        return ResponseEntity.ok(cartService.emptyCart(userDetailsImp.getUsername()));
     }
 
 

@@ -13,6 +13,8 @@ public interface OrderService {
 
     public List<OrderResponse>  getALlOrders(String email);
 
+    public OrderResponse getOrderById(String email, int orderId);
+
     public List<OrderResponse> getOrdersByProductId(String email, int productId);
 
     UpdatedOrderResponse updateStatus(int orderId, OrderDto orderDto);

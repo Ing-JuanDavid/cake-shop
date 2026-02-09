@@ -1,6 +1,7 @@
 package com.juan.cakeshop.jwt;
 
 
+import com.juan.cakeshop.api.model.UserDetailsImp;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,8 +43,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if(userName != null && jwtService.isTokenValid(token))
             {
 
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+
                 UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userName, null, roles);
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

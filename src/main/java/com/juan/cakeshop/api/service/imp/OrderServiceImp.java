@@ -61,6 +61,19 @@ public class OrderServiceImp implements OrderService {
     }
 
     @Override
+    public OrderResponse getOrderById(String email, int orderId) {
+        userRepository.findByEmail(email).orElseThrow(
+                ()-> new UsernameNotFoundException("User not found")
+        );
+
+        Order order = orderRepository.findById(orderId).orElseThrow(
+                OrderNotFound::new
+        );
+
+        return orderMapper.toResponse(order);
+    }
+
+    @Override
     public List<OrderResponse> getOrdersByProductId(String email, int productId) {
         User user = userRepository.findByEmail(email).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")

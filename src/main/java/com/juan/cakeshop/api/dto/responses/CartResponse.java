@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class CartResponse {
     private int productId;
-    private String productName;
+    private String name;
     private int price;
     private int quant;
     private int stock;

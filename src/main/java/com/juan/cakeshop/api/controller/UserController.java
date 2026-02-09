@@ -4,6 +4,7 @@ import com.juan.cakeshop.api.dto.requests.UserDto;
 import com.juan.cakeshop.api.dto.requests.UserInfoDto;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.api.dto.responses.UserResponse;
+import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,12 +57,12 @@ public class UserController {
     @PutMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GenericResponse<UserResponse>> updateUser(
-            @AuthenticationPrincipal String email,
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp,
             @RequestBody @Valid UserInfoDto userInfoDto)
     {
         return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
                 .ok(true)
-                .data(userService.updateUser(email, userInfoDto))
+                .data(userService.updateUser(userDetailsImp.getUsername(), userInfoDto))
                 .build());
     }
 

@@ -1,5 +1,6 @@
 package com.juan.cakeshop.jwt;
 
+import com.juan.cakeshop.api.model.UserDetailsImp;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -28,7 +29,7 @@ public class JwtService {
     @Value("${jwt.expiration}") // 2 minutes
     private Long EXPIRATION;
 
-    public String getToken(UserDetails user)
+    public String getToken(UserDetailsImp user)
     {
         HashMap<String, Object> extraClaims = new HashMap<>();
 
@@ -36,6 +37,7 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
+        extraClaims.put("name", user.getName());
         extraClaims.put("roles", roles);
 
         return getToken(extraClaims, user);

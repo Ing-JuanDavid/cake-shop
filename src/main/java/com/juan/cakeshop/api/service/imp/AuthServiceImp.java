@@ -48,7 +48,8 @@ public class AuthServiceImp implements com.juan.cakeshop.api.service.AuthService
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
         );
 
-        UserDetails user = userDetailsService.loadUserByUsername(loginDto.getEmail());
+        User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(
+                ()-> new UsernameNotFoundException("User not found"));
 
         return authMapper.toResponse(user);
     }
