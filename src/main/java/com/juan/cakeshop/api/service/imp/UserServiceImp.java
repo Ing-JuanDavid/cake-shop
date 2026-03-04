@@ -5,6 +5,7 @@ import com.juan.cakeshop.api.dto.requests.UserDto;
 import com.juan.cakeshop.api.dto.requests.UserInfoDto;
 import com.juan.cakeshop.api.dto.responses.UserResponse;
 import com.juan.cakeshop.api.model.User;
+import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.api.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +60,33 @@ public class UserServiceImp implements UserService {
         User updatedUser = userRepository.save(user);
 
         return userMapper.toResponse(updatedUser);
+    }
+
+    @Override
+    public UserResponse getUserInfo(UserDetailsImp userDetailsImp) {
+        return userMapper.toResponse(userDetailsImp.getUser());
+    }
+
+    @Override
+    public UserResponse lockUser(Long nip) {
+        User user = userRepository.findById(nip).orElseThrow(
+                ()-> new UsernameNotFoundException("User not found")
+        );
+
+        user.setAccountNonLocked(false);
+
+        return userMapper.toResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse unLockUser(Long nip) {
+        User user = userRepository.findById(nip).orElseThrow(
+                ()-> new UsernameNotFoundException("User not found")
+        );
+
+        user.setAccountNonLocked(true);
+
+        return userMapper.toResponse(userRepository.save(user));
     }
 
     @Override

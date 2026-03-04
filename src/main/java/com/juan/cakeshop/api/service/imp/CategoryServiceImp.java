@@ -1,9 +1,12 @@
 package com.juan.cakeshop.api.service.imp;
 
+import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.mapper.CategoryMapper;
 import com.juan.cakeshop.api.dto.requests.CategoryDto;
 import com.juan.cakeshop.api.dto.responses.CategoryResponse;
+import com.juan.cakeshop.api.mapper.ProductMapper;
 import com.juan.cakeshop.api.model.Category;
+import com.juan.cakeshop.api.model.Product;
 import com.juan.cakeshop.api.repository.CategoryRepository;
 import com.juan.cakeshop.api.service.CategoryService;
 import com.juan.cakeshop.exception.customExceptions.CategoryNotFoundException;
@@ -19,6 +22,7 @@ public class CategoryServiceImp implements CategoryService {
 
     final CategoryRepository categoryRepository;
     final CategoryMapper categoryMapper;
+    final ProductMapper productMapper;
 
     @Override
     public CategoryResponse createCategory(CategoryDto categoryDto) {

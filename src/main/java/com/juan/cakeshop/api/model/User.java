@@ -31,6 +31,9 @@ public class User  {
     private String address;
     private String telf;
 
+    @Column(name = "account_non_locked", nullable = false)
+    private boolean accountNonLocked = true;
+
     @OneToOne(mappedBy = "user")
     private Cart cart;
 

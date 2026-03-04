@@ -10,6 +10,8 @@ public interface ProductService {
 
     List<ProductResponse> getAllProducts();
 
+    List<ProductResponse> getProductsByCategory(int categoryId);
+
     ProductResponse deleteProduct(int productId);
 
     ProductResponse updateProduct(int productId, ProductDto productDto);

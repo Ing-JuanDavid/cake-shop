@@ -3,6 +3,7 @@ package com.juan.cakeshop.api.controller;
 import com.juan.cakeshop.api.dto.requests.CategoryDto;
 import com.juan.cakeshop.api.dto.responses.CategoryResponse;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
+import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class CategoryController {
 
     final CategoryService categoryService;

@@ -4,6 +4,7 @@ import com.juan.cakeshop.api.dto.requests.RegisterDto;
 import com.juan.cakeshop.api.dto.responses.AuthResponse;
 import com.juan.cakeshop.api.mapper.AuthMapper;
 import com.juan.cakeshop.api.model.User;
+import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.api.dto.requests.LoginDto;
 import com.juan.cakeshop.api.dto.requests.PasswordDto;
@@ -12,6 +13,7 @@ import com.juan.cakeshop.exception.customExceptions.UserAlreadyExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,14 +46,14 @@ public class AuthServiceImp implements com.juan.cakeshop.api.service.AuthService
 
     public AuthResponse login(LoginDto loginDto)
     {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginDto.getEmail(),
+                        loginDto.getPassword())
         );
 
-        User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(
-                ()-> new UsernameNotFoundException("User not found"));
-
-        return authMapper.toResponse(user);
+        UserDetailsImp user = (UserDetailsImp) auth.getPrincipal();
+        return authMapper.toResponse(user.getUser());
     }
 
     public AuthResponse changePassword(PasswordDto passwordDto)

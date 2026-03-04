@@ -66,6 +66,19 @@ public class ProductController {
                 .build());
     }
 
+    @GetMapping("/categories/{categoryId}")
+    public ResponseEntity<GenericResponse<List<ProductResponse>>> getProductsByCategory(
+            @PathVariable int categoryId
+    )
+    {
+        return ResponseEntity.ok(
+                GenericResponse.<List<ProductResponse>>builder()
+                        .ok(true)
+                        .data(productService.getProductsByCategory(categoryId))
+                        .build()
+        );
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{productId}")
     public ResponseEntity<GenericResponse<ProductResponse>> deleteProduct(@PathVariable int productId)

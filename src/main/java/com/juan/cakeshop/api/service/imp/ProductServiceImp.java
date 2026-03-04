@@ -34,6 +34,15 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
+    public List<ProductResponse> getProductsByCategory(int categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                ()-> new CategoryNotFoundException(categoryId)
+        );
+
+        return productMapper.products(category.getProducts());
+    }
+
+    @Override
     public ProductResponse createProduct(ProductDto productDto) {
 
         Category category = categoryRepository.findById(productDto.getCategoryId())

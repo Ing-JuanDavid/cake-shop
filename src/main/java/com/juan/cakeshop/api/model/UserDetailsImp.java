@@ -34,6 +34,11 @@ public class UserDetailsImp implements UserDetails {
     {
         return this.user.getName();
     }
+
+    public User getUser()
+    {
+        return this.user;
+    }
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -41,7 +46,7 @@ public class UserDetailsImp implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return this.user.isAccountNonLocked();
     }
 
     @Override

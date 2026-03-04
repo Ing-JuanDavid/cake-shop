@@ -18,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
 
     private final UserService userService;
@@ -54,8 +55,24 @@ public class UserController {
                 .build());
     }
 
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<GenericResponse<UserResponse>> getUserInfo(
+            @AuthenticationPrincipal UserDetailsImp userDetailsImp
+    )
+    {
+        return ResponseEntity.ok(
+                GenericResponse.<UserResponse>builder()
+                        .ok(true)
+                        .data(userService.getUserInfo(userDetailsImp))
+                        .build()
+        );
+    }
+
+
     @PutMapping("/me")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<GenericResponse<UserResponse>> updateUser(
             @AuthenticationPrincipal UserDetailsImp userDetailsImp,
             @RequestBody @Valid UserInfoDto userInfoDto)
@@ -75,5 +92,27 @@ public class UserController {
                 .data(userService.deleteUserByNip(nip))
                 .build());
     }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/lock/{nip}")
+    public ResponseEntity<GenericResponse<UserResponse>> lockUser(@PathVariable long nip)
+    {
+        return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
+                .ok(true)
+                .data(userService.lockUser(nip))
+                .build());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/unlock/{nip}")
+    public ResponseEntity<GenericResponse<UserResponse>> unLockUser(@PathVariable long nip)
+    {
+        return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
+                .ok(true)
+                .data(userService.unLockUser(nip))
+                .build());
+    }
+
 
 }

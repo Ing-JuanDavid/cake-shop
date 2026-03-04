@@ -17,11 +17,12 @@ public class UserMapper {
                 .nip(user.getNip())
                 .email(user.getEmail())
                 .name(user.getName())
-                .rol(user.getRol())
+                .roles(List.of("ROLE_"+user.getRol().name()))
                 .telf(user.getTelf())
                 .address(user.getAddress())
                 .sex(user.getSex())
                 .birth(user.getBirth())
+                .accountNonLocked(user.isAccountNonLocked())
                 .build();
     }
 
