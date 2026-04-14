@@ -1,9 +1,10 @@
 package com.juan.cakeshop.api.controller;
 
-import com.juan.cakeshop.api.dto.requests.UserDto;
-import com.juan.cakeshop.api.dto.requests.UserInfoDto;
+import com.juan.cakeshop.api.dto.requests.*;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
+import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.UserResponse;
+import com.juan.cakeshop.api.dto.responses.UserSimpleResponse;
 import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.service.UserService;
 import jakarta.validation.Valid;
@@ -23,11 +24,26 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
+
+    @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GenericResponse<List<UserResponse>>> getUsers()
+    public ResponseEntity<GenericResponse<UserSimpleResponse>> createUser(
+            @RequestBody @Valid UserRegisterDto userRegisterDto
+    )
     {
-        return ResponseEntity.ok(GenericResponse.<List<UserResponse>>builder()
+        return ResponseEntity.ok(
+                GenericResponse.<UserSimpleResponse>builder()
+                        .ok(true)
+                        .data(userService.createUser(userRegisterDto))
+                        .build()
+        );
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GenericResponse<List<UserSimpleResponse>>> getUsers()
+    {
+        return ResponseEntity.ok(GenericResponse.<List<UserSimpleResponse>>builder()
                 .ok(true)
                 .data(userService.getUsers())
                 .build());
@@ -45,11 +61,11 @@ public class UserController {
 
     @PutMapping("/{nip}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GenericResponse<UserResponse>> updateUser(
+    public ResponseEntity<GenericResponse<UserSimpleResponse>> updateUser(
             @PathVariable Long nip,
             @RequestBody @Valid UserDto userDto)
     {
-        return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
+        return ResponseEntity.ok(GenericResponse.<UserSimpleResponse>builder()
                 .ok(true)
                 .data(userService.updateUser(nip, userDto))
                 .build());
@@ -58,12 +74,12 @@ public class UserController {
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<GenericResponse<UserResponse>> getUserInfo(
+    public ResponseEntity<GenericResponse<UserSimpleResponse>> getUserInfo(
             @AuthenticationPrincipal UserDetailsImp userDetailsImp
     )
     {
         return ResponseEntity.ok(
-                GenericResponse.<UserResponse>builder()
+                GenericResponse.<UserSimpleResponse>builder()
                         .ok(true)
                         .data(userService.getUserInfo(userDetailsImp))
                         .build()
@@ -73,11 +89,11 @@ public class UserController {
 
     @PutMapping("/me")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<GenericResponse<UserResponse>> updateUser(
+    public ResponseEntity<GenericResponse<UserSimpleResponse>> updateUser(
             @AuthenticationPrincipal UserDetailsImp userDetailsImp,
             @RequestBody @Valid UserInfoDto userInfoDto)
     {
-        return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
+        return ResponseEntity.ok(GenericResponse.<UserSimpleResponse>builder()
                 .ok(true)
                 .data(userService.updateUser(userDetailsImp.getUsername(), userInfoDto))
                 .build());
@@ -85,9 +101,9 @@ public class UserController {
 
     @DeleteMapping("/{nip}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GenericResponse<UserResponse>> deleteUser(@PathVariable Long nip)
+    public ResponseEntity<GenericResponse<UserSimpleResponse>> deleteUser(@PathVariable Long nip)
     {
-        return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
+        return ResponseEntity.ok(GenericResponse.<UserSimpleResponse>builder()
                 .ok(true)
                 .data(userService.deleteUserByNip(nip))
                 .build());
@@ -96,9 +112,9 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/lock/{nip}")
-    public ResponseEntity<GenericResponse<UserResponse>> lockUser(@PathVariable long nip)
+    public ResponseEntity<GenericResponse<UserSimpleResponse>> lockUser(@PathVariable long nip)
     {
-        return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
+        return ResponseEntity.ok(GenericResponse.<UserSimpleResponse>builder()
                 .ok(true)
                 .data(userService.lockUser(nip))
                 .build());
@@ -106,11 +122,37 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/unlock/{nip}")
-    public ResponseEntity<GenericResponse<UserResponse>> unLockUser(@PathVariable long nip)
+    public ResponseEntity<GenericResponse<UserSimpleResponse>> unLockUser(@PathVariable long nip)
     {
-        return ResponseEntity.ok(GenericResponse.<UserResponse>builder()
+        return ResponseEntity.ok(GenericResponse.<UserSimpleResponse>builder()
                 .ok(true)
                 .data(userService.unLockUser(nip))
+                .build());
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public ResponseEntity<GenericResponse<PaginatedResponse<UserSimpleResponse>>> getUsers(
+            @RequestParam (required = false, defaultValue = "1") Integer currentPage,
+            @RequestParam (required = false, defaultValue = "5")Integer sizePage,
+            @RequestParam (required = false) String name,
+            @RequestParam (required = false) String email,
+            @RequestParam (required = false) Long nip,
+            @RequestParam (required = false) String role,
+            @RequestParam (required = false) Boolean accountNonLocked
+    )
+    {
+
+        UserFilterDto filters = UserFilterDto.builder()
+                .name(name)
+                .email(email)
+                .nip(nip)
+                .role(role)
+                .isAccountNonLocked(accountNonLocked)
+                .build();
+
+        return ResponseEntity.ok(GenericResponse.<PaginatedResponse<UserSimpleResponse>>builder()
+                .ok(true)
+                .data(userService.getUserss(currentPage, sizePage, filters))
                 .build());
     }
 

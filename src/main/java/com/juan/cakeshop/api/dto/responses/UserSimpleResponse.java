@@ -1,7 +1,5 @@
 package com.juan.cakeshop.api.dto.responses;
 
-import com.juan.cakeshop.api.dto.responses.OrderResponse;
-import com.juan.cakeshop.api.dto.responses.RateResponse;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class UserResponse {
+public class UserSimpleResponse {
     private Long nip;
     private String email;
     private String name;
@@ -20,6 +18,4 @@ public class UserResponse {
     private String address;
     private String telf;
     private boolean accountNonLocked;
-    private List<OrderResponse> orders;
-    private List<RateResponse> rates;
 }

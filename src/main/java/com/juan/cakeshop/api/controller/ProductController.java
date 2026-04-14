@@ -1,7 +1,9 @@
 package com.juan.cakeshop.api.controller;
 
 import com.juan.cakeshop.api.dto.requests.ProductDto;
+import com.juan.cakeshop.api.dto.requests.ProductFiltersDto;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
+import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.service.ProductService;
 import jakarta.validation.Valid;
@@ -33,7 +35,7 @@ public class ProductController {
                 .build());
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<GenericResponse<List<ProductResponse>>> getAllProducts()
     {
         return ResponseEntity.ok(GenericResponse.<List<ProductResponse>>builder()
@@ -89,4 +91,30 @@ public class ProductController {
                 .data(productResponse)
                 .build());
     }
+
+
+    @GetMapping
+    public ResponseEntity<GenericResponse<PaginatedResponse<ProductResponse>>> getProducts(
+            @RequestParam(required = false, defaultValue = "1") int currentPage,
+            @RequestParam(required = false, defaultValue = "5") int sizePage,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) Boolean available)
+    {
+        ProductFiltersDto filters = ProductFiltersDto.builder()
+                .name(name)
+                .category(category)
+                .minPrice(minPrice)
+                .maxPrice(maxPrice)
+                .available(available)
+                .build();
+
+        return ResponseEntity.ok(GenericResponse.<PaginatedResponse<ProductResponse>>builder()
+                .ok(true)
+                .data(productService.getProducts(currentPage, sizePage, filters))
+                .build());
+    }
+
 }

@@ -1,8 +1,10 @@
 package com.juan.cakeshop.api.mapper;
 
 import com.juan.cakeshop.api.dto.requests.ProductDto;
+import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.model.Product;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,5 +52,17 @@ public class ProductMapper {
         savedProduct.setPrice(productDto.getPrice());
         savedProduct.setDescription(productDto.getDescription());
         savedProduct.setQuant(productDto.getQuant());
+    }
+
+    public PaginatedResponse<ProductResponse> toPaginatedResponse(Page<Product> page, int currentPage)
+    {
+        return PaginatedResponse.<ProductResponse>builder()
+                .currentPage(currentPage)
+                .pageLength(page.getNumberOfElements())
+                .totalElements((int)page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .nextPage(page.hasNext() ? ++currentPage : currentPage)
+                .data(this.products(page.getContent()))
+                .build();
     }
 }

@@ -10,7 +10,14 @@ import java.time.LocalDate;
 
 @Data
 @Builder
-public class UserDto {
+public class UserRegisterDto {
+
+    @NotNull(message = "nip can't be null")
+    private Long nip;
+    @NotBlank(message = "email can't be empty")
+    private String email;
+    @NotBlank(message = "pass can't be empty")
+    private String password;
     @NotBlank(message = "name can't be empty")
     private String name;
     private LocalDate birth;

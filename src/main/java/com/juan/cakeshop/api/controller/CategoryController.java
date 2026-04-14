@@ -1,8 +1,11 @@
 package com.juan.cakeshop.api.controller;
 
 import com.juan.cakeshop.api.dto.requests.CategoryDto;
+import com.juan.cakeshop.api.dto.requests.CategoryFilterDto;
+import com.juan.cakeshop.api.dto.requests.ProductFiltersDto;
 import com.juan.cakeshop.api.dto.responses.CategoryResponse;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
+import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.service.CategoryService;
 import jakarta.validation.Valid;
@@ -24,7 +27,7 @@ public class CategoryController {
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse<CategoryResponse>> createCategory(
-            @RequestBody @Valid CategoryDto categoryDto
+            @ModelAttribute @Valid CategoryDto categoryDto
     )
     {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
@@ -33,7 +36,7 @@ public class CategoryController {
                 .build());
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<GenericResponse<List<CategoryResponse>>> getAllCategories()
     {
         return ResponseEntity.ok(GenericResponse.<List<CategoryResponse>>builder()
@@ -72,6 +75,28 @@ public class CategoryController {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()
                 .ok(true)
                 .data(categoryService.deleteCategory(categoryId))
+                .build());
+    }
+
+    @GetMapping
+    public ResponseEntity<GenericResponse<PaginatedResponse<CategoryResponse>>> getCategories(
+            @RequestParam (required = false, defaultValue = "1") Integer currentPage,
+            @RequestParam (required = false, defaultValue = "5")Integer sizePage,
+            @RequestParam (required = false) String name,
+            @RequestParam (required = false) Integer maxProducts,
+            @RequestParam (required = false) Integer minProducts
+    )
+    {
+
+        CategoryFilterDto filters = CategoryFilterDto.builder()
+                .name(name)
+                .maxProducts(maxProducts)
+                .minProducts(minProducts)
+                .build();
+
+        return ResponseEntity.ok(GenericResponse.<PaginatedResponse<CategoryResponse>>builder()
+                .ok(true)
+                .data(categoryService.getCategories(currentPage, sizePage, filters))
                 .build());
     }
 

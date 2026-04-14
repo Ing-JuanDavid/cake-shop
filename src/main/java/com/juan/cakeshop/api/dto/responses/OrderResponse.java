@@ -14,4 +14,5 @@ public class OrderResponse {
     private Integer total;
     private String status;
     private LocalDate date;
+    private String address;
 }

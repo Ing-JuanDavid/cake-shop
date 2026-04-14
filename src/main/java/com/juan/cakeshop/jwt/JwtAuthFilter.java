@@ -2,6 +2,8 @@ package com.juan.cakeshop.jwt;
 
 
 import com.juan.cakeshop.api.model.UserDetailsImp;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,26 +35,47 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String token = getTokenFromHeader(request);
+        try {
+            final String token = getTokenFromHeader(request);
 
-        if(token != null && SecurityContextHolder.getContext().getAuthentication() == null)
-        {
-            String userName = jwtService.getUserNameFromToken(token);
-            List<GrantedAuthority> roles = jwtService.getRolesFromToken(token);
-
-            if(userName != null && jwtService.isTokenValid(token))
+            if(token != null && SecurityContextHolder.getContext().getAuthentication() == null)
             {
+                String userName = jwtService.getUserNameFromToken(token);
+                List<GrantedAuthority> roles = jwtService.getRolesFromToken(token);
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+                if(userName != null && jwtService.isTokenValid(token))
+                {
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+            filterChain.doFilter(request,response);
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            response.setContentType("application/json");
+            response.getWriter().write("""
+                {
+                    "error": "Token expired",
+                    "message": "Please login again"
+                }
+            """);
+        } catch (JwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            response.setContentType("application/json");
+            response.getWriter().write("""
+                {
+                    "error": "Invalid token"
+                }
+            """);
         }
-        filterChain.doFilter(request,response);
+
+
     }
 
     private String getTokenFromHeader(HttpServletRequest request)

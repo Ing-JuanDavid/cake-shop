@@ -2,14 +2,12 @@ package com.juan.cakeshop.api.mapper;
 
 import com.juan.cakeshop.api.dto.requests.RegisterDto;
 import com.juan.cakeshop.api.dto.responses.AuthResponse;
-import com.juan.cakeshop.api.dto.responses.UserResponse;
 import com.juan.cakeshop.api.model.Rol;
 import com.juan.cakeshop.api.model.User;
 import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
 import com.juan.cakeshop.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +41,7 @@ public class AuthMapper {
     public AuthResponse toResponse(User user)
     {
         return AuthResponse.builder()
-                .user(userMapper.toResponse(user))
+                .user(userMapper.toSimpleResponse(user))
                 .token(jwtService.getToken(new UserDetailsImp(user)))
                 .build();
     }

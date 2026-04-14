@@ -14,7 +14,6 @@ import java.time.LocalDate;
         private String name;
         @NotNull(message = "birth can't be empty")
         private LocalDate birth;
-        @NotBlank(message = "sex can't be empty")
         private String sex;
         @NotBlank(message = "address can't be empty")
         private String address;

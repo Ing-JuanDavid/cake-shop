@@ -8,5 +8,6 @@ import lombok.Data;
 public class CategoryResponse {
     private Integer categoryId;
     private String name;
+    private String imgUrl;
     private Integer productsNumber;
 }

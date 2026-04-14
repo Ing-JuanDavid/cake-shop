@@ -3,6 +3,7 @@ package com.juan.cakeshop.api.controller;
 import com.juan.cakeshop.api.dto.requests.OrderDto;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.api.dto.responses.OrderResponse;
+import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.UpdatedOrderResponse;
 import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.service.OrderService;
@@ -42,11 +43,11 @@ public class OrderController {
     {
         return ResponseEntity.ok(GenericResponse.<List<OrderResponse>>builder()
                 .ok(true)
-                .data(orderService.getALlOrders(userDetailsImp.getUsername()))
+                .data(orderService.getAllOrders(userDetailsImp.getUsername()))
                 .build());
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/{orderId}")
     public ResponseEntity<GenericResponse<OrderResponse>> getOrderById(
             @AuthenticationPrincipal UserDetailsImp userDetailsImp,
@@ -57,6 +58,23 @@ public class OrderController {
                 .data(orderService.getOrderById(userDetailsImp.getUsername(), orderId))
                 .build()) ;
     }
+
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @GetMapping("/users/{nip}")
+    public ResponseEntity<GenericResponse<PaginatedResponse<OrderResponse>>> getOrdersByUser(
+            @PathVariable long nip,
+            @RequestParam(defaultValue = "5", required = false) int pageSize,
+            @RequestParam(defaultValue = "1", required = false) int currentPage
+    )
+    {
+     return ResponseEntity.ok(
+             GenericResponse.<PaginatedResponse<OrderResponse>>builder()
+                     .ok(true)
+                     .data(orderService.getOrdersByUser(nip, pageSize, currentPage))
+                     .build()
+     );
+    }
+
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/product/{productId}")

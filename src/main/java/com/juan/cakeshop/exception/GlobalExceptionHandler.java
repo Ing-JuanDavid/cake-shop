@@ -3,6 +3,7 @@ package com.juan.cakeshop.exception;
 import com.juan.cakeshop.api.dto.responses.FieldErrorsResponse;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.exception.customExceptions.BusinessException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;

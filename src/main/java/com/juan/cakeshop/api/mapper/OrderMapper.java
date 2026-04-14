@@ -2,12 +2,14 @@ package com.juan.cakeshop.api.mapper;
 
 import com.juan.cakeshop.api.dto.OrderStatus;
 import com.juan.cakeshop.api.dto.responses.OrderResponse;
+import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.UpdatedOrderResponse;
 import com.juan.cakeshop.api.model.CartProduct;
 import com.juan.cakeshop.api.model.Order;
 import com.juan.cakeshop.api.model.User;
 import com.juan.cakeshop.api.service.CartService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -42,6 +44,7 @@ public class OrderMapper {
                 .total(order.getTotal())
                 .date(order.getDate())
                 .status(order.getStatus().name())
+                .address(order.getAddress())    
                 .build();
     }
 
@@ -57,5 +60,17 @@ public class OrderMapper {
         return orders.stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public PaginatedResponse<OrderResponse> toPaginatedResponse(Page<Order> page, int currentPage)
+    {
+        return PaginatedResponse.<OrderResponse>builder()
+                .pageLength(page.getNumberOfElements())
+                .totalPages(page.getTotalPages())
+                .currentPage(currentPage)
+                .nextPage(page.hasNext() ? ++currentPage : currentPage)
+                .totalElements((int) page.getTotalElements())
+                .data(this.toList(page.getContent()))
+                .build();
     }
 }

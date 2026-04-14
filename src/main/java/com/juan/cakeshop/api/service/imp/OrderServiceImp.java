@@ -1,5 +1,6 @@
 package com.juan.cakeshop.api.service.imp;
 
+import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.mapper.OrderMapper;
 import com.juan.cakeshop.api.dto.requests.OrderDto;
 import com.juan.cakeshop.api.dto.responses.OrderResponse;
@@ -11,15 +12,18 @@ import com.juan.cakeshop.api.repository.OrderRepository;
 import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.api.service.OrderService;
 import com.juan.cakeshop.exception.customExceptions.EmptyCartException;
+import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
 import com.juan.cakeshop.exception.customExceptions.OrderNotFound;
 import com.juan.cakeshop.exception.customExceptions.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,12 +56,11 @@ public class OrderServiceImp implements OrderService {
         return orderMapper.toResponse(orderRepository.save(order));    }
 
     @Override
-    public List<OrderResponse> getALlOrders(String email) {
+    public List<OrderResponse> getAllOrders(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
         );
-
-        return orderMapper.toList(user.getOrders());
+        return orderMapper.toList(orderRepository.findAllByUserOrderByDateDesc(user));
     }
 
     @Override
@@ -92,6 +95,30 @@ public class OrderServiceImp implements OrderService {
     }
 
     @Override
+    public PaginatedResponse<OrderResponse> getOrdersByUser(long nip, int pageSize, int currentPage) {
+
+        if(pageSize < 1) throw  new InvalidInputException("pageSize");
+        if(currentPage < 1) throw  new InvalidInputException("currentPage");
+
+        User user = userRepository.findById(nip).orElseThrow(
+                ()-> new UsernameNotFoundException("User not found")
+        );
+
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "date"));
+
+        long totalOrders = orderRepository.countByUserNip(nip);
+        int totalPages = (int)Math.ceil((double)totalOrders/pageSize);
+
+        if(totalPages == 0) return orderMapper.toPaginatedResponse(Page.empty(), 1);
+
+        if(currentPage > totalPages) throw new InvalidInputException("currentPage");
+
+        Page<Order> page = orderRepository.findAllByUser(user, pageable);
+
+        return orderMapper.toPaginatedResponse(page, currentPage);
+    }
+
+    @Override
     public UpdatedOrderResponse updateStatus(int orderId, OrderDto orderDto) {
         Order order = orderRepository.findById(orderId).orElseThrow(
                 OrderNotFound::new
@@ -101,4 +128,6 @@ public class OrderServiceImp implements OrderService {
 
         return orderMapper.toUpdateResponse(orderRepository.save(order));
     }
+
+
 }

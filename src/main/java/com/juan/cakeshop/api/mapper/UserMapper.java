@@ -1,17 +1,43 @@
 package com.juan.cakeshop.api.mapper;
 
 import com.juan.cakeshop.api.dto.requests.RegisterDto;
+import com.juan.cakeshop.api.dto.requests.UserRegisterDto;
 import com.juan.cakeshop.api.dto.requests.UserInfoDto;
+import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.UserResponse;
+import com.juan.cakeshop.api.dto.responses.UserSimpleResponse;
 import com.juan.cakeshop.api.model.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-
+@RequiredArgsConstructor
 public class UserMapper {
-    public UserResponse toResponse(User user)
+
+    private final PasswordEncoder passwordEncoder;
+    private final RateMapper rateMapper;
+    private final OrderMapper orderMapper;
+
+    public UserSimpleResponse toSimpleResponse(User user)
+    {
+        return UserSimpleResponse.builder()
+                .nip(user.getNip())
+                .email(user.getEmail())
+                .name(user.getName())
+                .roles(List.of("ROLE_"+user.getRol().name()))
+                .telf(user.getTelf())
+                .address(user.getAddress())
+                .sex(user.getSex())
+                .birth(user.getBirth())
+                .accountNonLocked(user.isAccountNonLocked())
+                .build();
+    }
+
+    public UserResponse toCompleteResponse(User user)
     {
         return UserResponse.builder()
                 .nip(user.getNip())
@@ -23,6 +49,8 @@ public class UserMapper {
                 .sex(user.getSex())
                 .birth(user.getBirth())
                 .accountNonLocked(user.isAccountNonLocked())
+                .rates(this.rateMapper.toList(user.getRates()))
+                .orders(this.orderMapper.toList(user.getOrders()))
                 .build();
     }
 
@@ -39,10 +67,26 @@ public class UserMapper {
                 .build();
     }
 
-    public List<UserResponse> toList(List<User> users)
+    public User toEntity(UserRegisterDto registerDto)
+    {
+        return User.builder()
+                .email(registerDto.getEmail())
+                .pass(passwordEncoder.encode(registerDto.getPassword()))
+                .nip(registerDto.getNip())
+                .name(registerDto.getName())
+                .birth(registerDto.getBirth())
+                .sex(registerDto.getSex())
+                .rol(registerDto.getRol())
+                .telf(registerDto.getTelf())
+                .address(registerDto.getAddress())
+                .accountNonLocked(true)
+                .build();
+    }
+
+    public List<UserSimpleResponse> toList(List<User> users)
     {
         return users.stream()
-                .map(this::toResponse)
+                .map(this::toSimpleResponse)
                 .toList();
     }
 
@@ -63,5 +107,17 @@ public class UserMapper {
         user.setTelf(userInfoDto.getTelf());
         user.setBirth(userInfoDto.getBirth());
         return user;
+    }
+
+    public PaginatedResponse<UserSimpleResponse> toPaginatedResponse(int currentPage, Page<User> page)
+    {
+        return PaginatedResponse.<UserSimpleResponse>builder()
+                .currentPage(currentPage)
+                .pageLength((int)page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .totalElements((int)page.getTotalElements())
+                .nextPage(page.hasNext()? ++currentPage : currentPage)
+                .data(this.toList(page.getContent()))
+                .build();
     }
 }

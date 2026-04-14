@@ -22,6 +22,7 @@ public class Category {
     private Integer categoryId;
 
     private String name;
+    private String imgUrl;
 
     @Builder.Default
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
