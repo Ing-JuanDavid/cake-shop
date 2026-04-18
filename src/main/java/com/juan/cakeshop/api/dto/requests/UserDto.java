@@ -17,6 +17,5 @@ public class UserDto {
     @NotNull(message = "rol can't be null")
     private Rol rol;
     private String sex;
-    private String address;
     private String telf;
 }

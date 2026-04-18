@@ -29,7 +29,6 @@ public class UserAddressMapper {
                 .department(address.getDepartment())
                 .addressLine(address.getAddressLine())
                 .description(address.getDescription())
-                .isDefault(address.isDefault())
                 .nip(address.getUser().getNip()).build();
     }
 

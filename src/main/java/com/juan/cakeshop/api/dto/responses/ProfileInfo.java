@@ -8,14 +8,14 @@ import java.util.List;
 
 @Data
 @Builder
-public class UserSimpleResponse {
+public class ProfileInfo {
     private Long nip;
     private String email;
     private String name;
     private LocalDate birth;
     private List<String> roles;
     private String sex;
-    private String address;
+    private List<UserAddressResponse> addresses;
     private String telf;
     private boolean accountNonLocked;
 }

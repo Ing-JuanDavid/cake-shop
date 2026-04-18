@@ -22,14 +22,18 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderId;
+    private LocalDate date;
+    private Integer total;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
     @ManyToOne()
     @JoinColumn(name = "nip", nullable = false)
     private User user;
-    private LocalDate date;
-    private Integer total;
-    private String address;
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    private UserAddress address;
 
     @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

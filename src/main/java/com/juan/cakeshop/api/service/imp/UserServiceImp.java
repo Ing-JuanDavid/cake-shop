@@ -7,7 +7,7 @@ import com.juan.cakeshop.api.dto.responses.UserResponse;
 import com.juan.cakeshop.api.mapper.UserMapper;
 import com.juan.cakeshop.api.dto.requests.UserDto;
 import com.juan.cakeshop.api.dto.requests.UserInfoDto;
-import com.juan.cakeshop.api.dto.responses.UserSimpleResponse;
+import com.juan.cakeshop.api.dto.responses.ProfileInfo;
 import com.juan.cakeshop.api.model.User;
 import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.repository.UserRepository;
@@ -34,7 +34,7 @@ public class UserServiceImp implements UserService {
     final UserMapper userMapper;
 
     @Override
-    public List<UserSimpleResponse> getUsers() {
+    public List<ProfileInfo> getUsers() {
         return userMapper.toList(userRepository.findAll());
     }
 
@@ -48,7 +48,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserSimpleResponse createUser(UserRegisterDto userRegisterDto) {
+    public ProfileInfo createUser(UserRegisterDto userRegisterDto) {
 
         if(userRepository.existsById(userRegisterDto.getNip())) {
             throw new UserAlreadyExistException("NIP", userRegisterDto.getNip().toString());
@@ -64,7 +64,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserSimpleResponse updateUser(Long nip, UserDto userDto) {
+    public ProfileInfo updateUser(Long nip, UserDto userDto) {
 
         User user = userRepository.findById(nip).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
@@ -78,7 +78,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserSimpleResponse updateUser(String email, UserInfoDto userInfoDto) {
+    public ProfileInfo updateUser(String email, UserInfoDto userInfoDto) {
         User user = userRepository.findByEmail(email).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
         );
@@ -91,12 +91,15 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserSimpleResponse getUserInfo(UserDetailsImp userDetailsImp) {
-        return userMapper.toSimpleResponse(userDetailsImp.getUser());
+    public ProfileInfo getUserInfo(UserDetailsImp userDetailsImp) {
+        User user = userRepository.findByEmail(userDetailsImp.getUsername()).orElseThrow(
+                ()-> new UsernameNotFoundException("Usuario no encontrado")
+        );
+        return userMapper.toSimpleResponse(user);
     }
 
     @Override
-    public UserSimpleResponse lockUser(Long nip) {
+    public ProfileInfo lockUser(Long nip) {
         User user = userRepository.findById(nip).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
         );
@@ -107,7 +110,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserSimpleResponse unLockUser(Long nip) {
+    public ProfileInfo unLockUser(Long nip) {
         User user = userRepository.findById(nip).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
         );
@@ -118,7 +121,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public PaginatedResponse<UserSimpleResponse> getUserss(int currentPage, int sizePage, UserFilterDto filters) {
+    public PaginatedResponse<ProfileInfo> getUserss(int currentPage, int sizePage, UserFilterDto filters) {
 
         if(currentPage<1) throw new InvalidInputException("currentPage");
         if(sizePage<1) throw new InvalidInputException("sizePage");
@@ -142,7 +145,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserSimpleResponse deleteUserByNip(Long nip) {
+    public ProfileInfo deleteUserByNip(Long nip) {
         User user = userRepository.findById(nip).orElseThrow(
                 ()-> new UsernameNotFoundException("User not found")
         );

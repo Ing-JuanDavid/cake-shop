@@ -9,17 +9,16 @@ import com.juan.cakeshop.api.mapper.ProductMapper;
 import com.juan.cakeshop.api.model.*;
 import com.juan.cakeshop.api.repository.CartRepository;
 import com.juan.cakeshop.api.repository.OrderRepository;
+import com.juan.cakeshop.api.repository.UserAddressRepository;
 import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.api.service.OrderService;
-import com.juan.cakeshop.exception.customExceptions.EmptyCartException;
-import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
-import com.juan.cakeshop.exception.customExceptions.OrderNotFound;
-import com.juan.cakeshop.exception.customExceptions.ProductNotFoundException;
+import com.juan.cakeshop.exception.customExceptions.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +32,7 @@ public class OrderServiceImp implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final CartRepository cartRepository;
+    final UserAddressRepository userAddressRepository;
     private final ProductMapper productMapper;
 
     @Override
@@ -42,13 +42,18 @@ public class OrderServiceImp implements OrderService {
                 ()-> new UsernameNotFoundException("User not found")
         );
 
+        UserAddress defaultAddress = userAddressRepository.findByUserNipAndIsDefaultTrue(user.getNip())
+                .orElseThrow(
+                        ()-> new UserAddressException("Debe seleccionar una direccion", HttpStatus.BAD_REQUEST)
+                );
+
         Cart cart = user.getCart();
 
         List<CartProduct> cartProducts = cart.getCartProduct();
 
-        if(cartProducts.isEmpty()) throw new EmptyCartException("Cart empty");
+        if(cartProducts.isEmpty()) throw new EmptyCartException("Carrito vacio");
 
-        Order order = orderMapper.toEntity(user, cartProducts);
+        Order order = orderMapper.toEntity(user, cartProducts, defaultAddress);
 
         cart.getCartProduct().clear();
         cartRepository.save(cart);

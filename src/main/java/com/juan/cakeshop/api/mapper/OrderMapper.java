@@ -7,6 +7,7 @@ import com.juan.cakeshop.api.dto.responses.UpdatedOrderResponse;
 import com.juan.cakeshop.api.model.CartProduct;
 import com.juan.cakeshop.api.model.Order;
 import com.juan.cakeshop.api.model.User;
+import com.juan.cakeshop.api.model.UserAddress;
 import com.juan.cakeshop.api.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,16 +21,17 @@ import java.util.List;
 public class OrderMapper {
 
     private final CartService cartService;
+    private final UserAddressMapper userAddressMapper;
     private final OrderProductMapper orderProductMapper;
 
-    public Order toEntity(User user, List<CartProduct> cartProducts)
+    public Order toEntity(User user, List<CartProduct> cartProducts, UserAddress defaulAddress)
     {
          Order order = Order.builder()
                 .user(user)
                 .total(cartService.calcCartTotal(cartProducts))
                 .date(LocalDate.now())
                 .status(OrderStatus.PENDING)
-                .address(user.getAddress())
+                .address(defaulAddress)
                 .build();
 
          order.setOrderProducts(orderProductMapper.getOrderProductsFromCartProductList(cartProducts, order));
@@ -37,6 +39,8 @@ public class OrderMapper {
          return order;
     }
 
+
+    // having in account this method for debugging
     public OrderResponse toResponse(Order order) {
         return OrderResponse.builder()
                 .OrderId(order.getOrderId())
@@ -44,7 +48,7 @@ public class OrderMapper {
                 .total(order.getTotal())
                 .date(order.getDate())
                 .status(order.getStatus().name())
-                .address(order.getAddress())    
+                .address(userAddressMapper.toResponse(order.getAddress()))
                 .build();
     }
 

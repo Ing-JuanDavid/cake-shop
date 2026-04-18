@@ -5,7 +5,7 @@ import com.juan.cakeshop.api.dto.requests.UserRegisterDto;
 import com.juan.cakeshop.api.dto.requests.UserInfoDto;
 import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.UserResponse;
-import com.juan.cakeshop.api.dto.responses.UserSimpleResponse;
+import com.juan.cakeshop.api.dto.responses.ProfileInfo;
 import com.juan.cakeshop.api.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,16 +21,17 @@ public class UserMapper {
     private final PasswordEncoder passwordEncoder;
     private final RateMapper rateMapper;
     private final OrderMapper orderMapper;
+    private final UserAddressMapper userAddressMapper;
 
-    public UserSimpleResponse toSimpleResponse(User user)
+    public ProfileInfo toSimpleResponse(User user)
     {
-        return UserSimpleResponse.builder()
+        return ProfileInfo.builder()
                 .nip(user.getNip())
                 .email(user.getEmail())
                 .name(user.getName())
                 .roles(List.of("ROLE_"+user.getRol().name()))
                 .telf(user.getTelf())
-                .address(user.getAddress())
+                .addresses(userAddressMapper.toList(user.getAddresses()))
                 .sex(user.getSex())
                 .birth(user.getBirth())
                 .accountNonLocked(user.isAccountNonLocked())
@@ -45,7 +46,7 @@ public class UserMapper {
                 .name(user.getName())
                 .roles(List.of("ROLE_"+user.getRol().name()))
                 .telf(user.getTelf())
-                .address(user.getAddress())
+                .addresses(userAddressMapper.toList(user.getAddresses()))
                 .sex(user.getSex())
                 .birth(user.getBirth())
                 .accountNonLocked(user.isAccountNonLocked())
@@ -61,10 +62,10 @@ public class UserMapper {
                 .email(registerDto.getEmail())
                 .name(registerDto.getName())
                 .telf(registerDto.getTelf())
-                .address(registerDto.getAddress())
                 .sex(registerDto.getSex())
                 .birth(registerDto.getBirth())
                 .build();
+        //.address(registerDto.getAddress()) pending add a direccion when a user sign in for first time
     }
 
     public User toEntity(UserRegisterDto registerDto)
@@ -78,12 +79,11 @@ public class UserMapper {
                 .sex(registerDto.getSex())
                 .rol(registerDto.getRol())
                 .telf(registerDto.getTelf())
-                .address(registerDto.getAddress())
                 .accountNonLocked(true)
                 .build();
     }
 
-    public List<UserSimpleResponse> toList(List<User> users)
+    public List<ProfileInfo> toList(List<User> users)
     {
         return users.stream()
                 .map(this::toSimpleResponse)
@@ -92,7 +92,6 @@ public class UserMapper {
 
     public User updateFromDto(User user, com.juan.cakeshop.api.dto.requests.UserDto userDto) {
         user.setName(userDto.getName());
-        user.setAddress(userDto.getAddress());
         user.setRol(userDto.getRol());
         user.setSex(userDto.getSex());
         user.setTelf(userDto.getTelf());
@@ -102,16 +101,15 @@ public class UserMapper {
 
     public User updateFromDto(User user, UserInfoDto userInfoDto) {
         user.setName(userInfoDto.getName());
-        user.setAddress(userInfoDto.getAddress());
         user.setSex(userInfoDto.getSex());
         user.setTelf(userInfoDto.getTelf());
         user.setBirth(userInfoDto.getBirth());
         return user;
     }
 
-    public PaginatedResponse<UserSimpleResponse> toPaginatedResponse(int currentPage, Page<User> page)
+    public PaginatedResponse<ProfileInfo> toPaginatedResponse(int currentPage, Page<User> page)
     {
-        return PaginatedResponse.<UserSimpleResponse>builder()
+        return PaginatedResponse.<ProfileInfo>builder()
                 .currentPage(currentPage)
                 .pageLength((int)page.getTotalElements())
                 .totalPages(page.getTotalPages())

@@ -28,21 +28,23 @@ public class User  {
     @Enumerated(EnumType.STRING)
     private Rol rol;
     private String sex;
-    private String address;
     private String telf;
 
     @Column(name = "account_non_locked", nullable = false)
     private boolean accountNonLocked = true;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UserAddress> addresses = new ArrayList<>();
+
     @OneToOne(mappedBy = "user")
     private Cart cart;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Rate> rates = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<UserAddress> addresses = new ArrayList<>();
 }

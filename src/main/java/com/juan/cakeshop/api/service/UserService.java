@@ -6,30 +6,30 @@ import com.juan.cakeshop.api.dto.requests.UserFilterDto;
 import com.juan.cakeshop.api.dto.requests.UserInfoDto;
 import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.UserResponse;
-import com.juan.cakeshop.api.dto.responses.UserSimpleResponse;
+import com.juan.cakeshop.api.dto.responses.ProfileInfo;
 import com.juan.cakeshop.api.model.UserDetailsImp;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<UserSimpleResponse> getUsers();
+    List<ProfileInfo> getUsers();
 
     UserResponse findUser(Long nip);
 
-    UserSimpleResponse createUser(UserRegisterDto userRegisterDto);
+    ProfileInfo createUser(UserRegisterDto userRegisterDto);
 
-    UserSimpleResponse updateUser(Long nip, UserDto userDto);
+    ProfileInfo updateUser(Long nip, UserDto userDto);
 
-    UserSimpleResponse updateUser(String  email, UserInfoDto userInfoDto);
+    ProfileInfo updateUser(String  email, UserInfoDto userInfoDto);
 
-    UserSimpleResponse deleteUserByNip(Long nip);
+    ProfileInfo deleteUserByNip(Long nip);
 
-    UserSimpleResponse getUserInfo(UserDetailsImp userDetailsImp);
+    ProfileInfo getUserInfo(UserDetailsImp userDetailsImp);
 
-    UserSimpleResponse lockUser(Long nip);
+    ProfileInfo lockUser(Long nip);
 
-    UserSimpleResponse unLockUser(Long nip);
+    ProfileInfo unLockUser(Long nip);
 
-    PaginatedResponse<UserSimpleResponse> getUserss(int currentPage, int sizePage, UserFilterDto filters);
+    PaginatedResponse<ProfileInfo> getUserss(int currentPage, int sizePage, UserFilterDto filters);
 }

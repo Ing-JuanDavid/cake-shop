@@ -17,7 +17,7 @@ public class UserResponse {
     private LocalDate birth;
     private List<String> roles;
     private String sex;
-    private String address;
+    private List<UserAddressResponse> addresses;
     private String telf;
     private boolean accountNonLocked;
     private List<OrderResponse> orders;

@@ -34,7 +34,6 @@ public class AuthMapper {
                 .sex(registerDto.getSex())
                 .rol(Rol.USER)
                 .telf(registerDto.getTelf())
-                .address(registerDto.getAddress())
                 .build();
     }
 
