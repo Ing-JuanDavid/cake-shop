@@ -34,7 +34,10 @@ public class UserAddressMapper {
 
     public List<UserAddressResponse> toList(List<UserAddress> addresses)
     {
-        return addresses.stream().map(this::toResponse).toList();
+        if(addresses == null) return List.of();
+        return addresses.stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public UserAddress updateFromDto(UserAddress savedAddress, UserAddressDto addressDto)

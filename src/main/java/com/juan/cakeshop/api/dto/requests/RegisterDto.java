@@ -23,8 +23,6 @@ public class RegisterDto {
     @NotNull(message = "nip is required")
     private Long nip;
     private String sex;
-    @NotBlank(message = "address can't be empty")
-    private String address;
     @NotBlank(message = "telf can't be empty")
     private String telf;
 }
