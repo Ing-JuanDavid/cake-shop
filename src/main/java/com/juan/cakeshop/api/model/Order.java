@@ -31,7 +31,7 @@ public class Order {
     @JoinColumn(name = "nip", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "address_id", nullable = false)
     private UserAddress address;
 

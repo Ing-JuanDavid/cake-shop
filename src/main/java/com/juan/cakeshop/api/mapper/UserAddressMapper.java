@@ -29,7 +29,9 @@ public class UserAddressMapper {
                 .department(address.getDepartment())
                 .addressLine(address.getAddressLine())
                 .description(address.getDescription())
-                .nip(address.getUser().getNip()).build();
+                .nip(address.getUser().getNip())
+                .isDefault(address.isDefault())
+                .build();
     }
 
     public List<UserAddressResponse> toList(List<UserAddress> addresses)

@@ -12,5 +12,6 @@ public class UserAddressResponse {
     private String department;
     private String addressLine;
     private String description;
+    private boolean isDefault;
     long nip;
 }
