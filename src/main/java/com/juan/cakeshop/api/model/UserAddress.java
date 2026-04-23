@@ -1,5 +1,6 @@
 package com.juan.cakeshop.api.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,7 @@ public class UserAddress {
     private String addressLine;
     private String description;
     private boolean isDefault;
+    private Boolean isActive;
 
     @ManyToOne
     @JoinColumn(name = "user_nip", nullable = false)

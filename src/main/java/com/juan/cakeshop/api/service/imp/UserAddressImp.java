@@ -49,7 +49,7 @@ public class UserAddressImp implements UserAddressService {
      * Get all of user's registered address*/
     @Override
     public List<UserAddressResponse> getAddresses(long nip) {
-        return userAddressMapper.toList(userAddressRepository.findAllByUserNip(nip));
+        return userAddressMapper.toList(userAddressRepository.findAllByUserNipAndIsActiveTrue(nip));
     }
 
 
@@ -98,6 +98,9 @@ public class UserAddressImp implements UserAddressService {
                 ()-> new UserAddressException("Direccion no encontrada", HttpStatus.NOT_FOUND)
         );
 
-        userAddressRepository.delete(address);
+        if(address.isDefault()) address.setDefault(false);
+        address.setIsActive(false);
+
+        userAddressRepository.save(address);
     }
 }

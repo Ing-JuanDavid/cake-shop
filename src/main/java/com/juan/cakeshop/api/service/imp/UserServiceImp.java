@@ -10,6 +10,7 @@ import com.juan.cakeshop.api.dto.requests.UserInfoDto;
 import com.juan.cakeshop.api.dto.responses.ProfileInfo;
 import com.juan.cakeshop.api.model.User;
 import com.juan.cakeshop.api.model.UserDetailsImp;
+import com.juan.cakeshop.api.repository.UserAddressRepository;
 import com.juan.cakeshop.api.repository.UserRepository;
 import com.juan.cakeshop.api.service.UserService;
 import com.juan.cakeshop.api.specifications.UserSpecification;
@@ -31,6 +32,7 @@ import java.util.List;
 public class UserServiceImp implements UserService {
 
     final UserRepository userRepository;
+    final UserAddressRepository userAddressRepository;
     final UserMapper userMapper;
 
     @Override
@@ -95,6 +97,8 @@ public class UserServiceImp implements UserService {
         User user = userRepository.findByEmail(userDetailsImp.getUsername()).orElseThrow(
                 ()-> new UsernameNotFoundException("Usuario no encontrado")
         );
+
+        user.setAddresses(userAddressRepository.findAllByUserNipAndIsActiveTrue(user.getNip()));
         return userMapper.toSimpleResponse(user);
     }
 

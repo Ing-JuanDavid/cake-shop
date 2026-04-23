@@ -18,6 +18,8 @@ public interface UserAddressRepository extends JpaRepository<UserAddress, Intege
 
     List<UserAddress> findAllByUserNip(long nip);
 
+    List<UserAddress> findAllByUserNipAndIsActiveTrue(long nip);
+
     Optional<UserAddress> findByUserNipAndIsDefaultTrue(long id);
 
     Optional<UserAddress> findByAddressIdAndUserNip(int addressId, long nip);
