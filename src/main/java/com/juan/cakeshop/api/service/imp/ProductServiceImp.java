@@ -7,7 +7,9 @@ import com.juan.cakeshop.api.dto.requests.ProductDto;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.model.Category;
 import com.juan.cakeshop.api.model.Product;
+import com.juan.cakeshop.api.model.ProductImage;
 import com.juan.cakeshop.api.repository.CategoryRepository;
+import com.juan.cakeshop.api.repository.ProductImageRepository;
 import com.juan.cakeshop.api.repository.ProductRepository;
 import com.juan.cakeshop.api.service.ProductService;
 import com.juan.cakeshop.api.specifications.ProductSpecification;
@@ -31,6 +33,7 @@ public class ProductServiceImp implements ProductService {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final ProductImageRepository productImageRepository;
     private final CloudinaryServiceImp cloudinaryServiceImp;
     private final ProductMapper productMapper;
 
@@ -56,18 +59,27 @@ public class ProductServiceImp implements ProductService {
         Category category = categoryRepository.findById(productDto.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(productDto.getCategoryId()));
 
-        if (productDto.getImg() == null || productDto.getImg().isEmpty()) {
+        if (productDto.getImages() == null || productDto.getImages().isEmpty()) {
             throw new InvalidProductImageException();
         }
 
-        String imageUrl = cloudinaryServiceImp.uploadedImg(productDto.getImg(), "folder_1");
-
         Product product = productMapper.toEntity(productDto);
         product.setCategory(category);
-        product.setImg(imageUrl);
-
         productRepository.save(product);
 
+         List<ProductImage> images = productDto.getImages().stream().map(
+                 file -> {
+                     String url = cloudinaryServiceImp.uploadedImg(file, "folder_1");
+                     return ProductImage.builder()
+                             .imageUrl(url)
+                             .product(product)
+                             .build();
+                 }
+         ).toList();
+
+
+         productImageRepository.saveAll(images);
+         product.setProductImages(images);
         return productMapper.toResponse(product);
     }
 
@@ -79,12 +91,21 @@ public class ProductServiceImp implements ProductService {
                 ()-> new ProductNotFoundException(productId)
         );
 
-        boolean deleted = cloudinaryServiceImp.deleteImg("folder_1",product.getImg());
-
-        if(! deleted) throw new CloudinaryException("Failed to delete product's image from cloudinary", HttpStatus.INTERNAL_SERVER_ERROR);
-
         productRepository.delete(product);
 
+        List<ProductImage> productImages = product.getProductImages();
+        if(! productImages.isEmpty()) {
+            productImages.forEach(
+                    productImage -> {
+                        boolean deleted = cloudinaryServiceImp
+                                .deleteImg("folder_1",productImage.getImageUrl());
+                        if(! deleted)
+                            throw new CloudinaryException(
+                                    "Failed to delete product's image from cloudinary",
+                                    HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
+            );
+        }
         return productMapper.toResponse(product);
     }
 
@@ -98,24 +119,31 @@ public class ProductServiceImp implements ProductService {
 
         Category category = savedProduct.getCategory();
 
-        if(!Objects.equals(productDtoCategoryId, category.getCategoryId()))
-            category = categoryRepository.findById(productDtoCategoryId).orElseThrow(()->new CategoryNotFoundException(productDtoCategoryId));
+        if(!Objects.equals(productDtoCategoryId, category.getCategoryId())) {
+            category = categoryRepository.findById(productDtoCategoryId).orElseThrow(
+                    () -> new CategoryNotFoundException(productDtoCategoryId));
 
-        String imgUrl = savedProduct.getImg();
-
-        if(productDto.getImg() != null &&  !productDto.getImg().isEmpty()){
-            if(imgUrl != null)
-                cloudinaryServiceImp.deleteImg("folder_1", imgUrl);
-            imgUrl = cloudinaryServiceImp.uploadedImg(productDto.getImg(), "folder_1");
+            savedProduct.setCategory(category);
         }
 
         productMapper.updateFromDto(productDto, savedProduct);
-        savedProduct.setCategory(category);
-        savedProduct.setImg(imgUrl);
 
-        Product updateProduct = productRepository.save(savedProduct);
+        productRepository.save(savedProduct);
 
-        return productMapper.toResponse(updateProduct);
+        if(productDto.getImages() != null && !productDto.getImages().isEmpty()) {
+            List<ProductImage> productImages = productDto.getImages().stream()
+                    .map(file -> {
+                        String url =   cloudinaryServiceImp.uploadedImg(file, "folder_1");
+                        return ProductImage.builder()
+                                .imageUrl(url)
+                                .product(savedProduct)
+                                .build();
+                    }).toList();
+            productImageRepository.saveAll(productImages);
+            savedProduct.setProductImages(productImages);
+        }
+
+        return productMapper.toResponse(savedProduct);
     }
 
     @Override

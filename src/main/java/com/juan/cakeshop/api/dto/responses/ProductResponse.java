@@ -3,6 +3,8 @@ package com.juan.cakeshop.api.dto.responses;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class ProductResponse {
@@ -13,6 +15,6 @@ public class ProductResponse {
     private String description;
     private String categoryName;
     private Float score;
-    private String imgUrl;
+    private List<String> images;
     private Integer rateNumber;
 }

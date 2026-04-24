@@ -29,7 +29,11 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
     private Float score;
-    private String img;
+    //private String img;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    List<ProductImage> productImages = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

@@ -27,7 +27,7 @@ public class CartProductMapper {
                 .price(cartProduct.getProduct().getPrice())
                 .quant(cartProduct.getQuant())
                 .stock(product.getQuant())
-                .img(product.getImg())
+                .img(product.getProductImages() != null ? product.getProductImages().get(0).getImageUrl(): "") //fix this
                 .build();
     }
 

@@ -4,6 +4,7 @@ import com.juan.cakeshop.api.dto.requests.ProductDto;
 import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.model.Product;
+import com.juan.cakeshop.api.model.ProductImage;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,10 @@ public class ProductMapper {
                 .description(product.getDescription())
                 .categoryName(product.getCategory().getName())
                 .score(product.getScore())
-                .imgUrl(product.getImg())
+                .images(
+                        product.getProductImages().stream()
+                                .map(ProductImage::getImageUrl)
+                                .toList())
                 .rateNumber(rateNumber)
                 .build();
     }

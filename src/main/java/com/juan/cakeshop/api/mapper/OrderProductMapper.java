@@ -30,7 +30,7 @@ import java.util.List;
                         .name(orderProduct.getProduct().getName())
                         .price(orderProduct.getProduct().getPrice())
                         .quant(orderProduct.getQuant())
-                        .img(orderProduct.getProduct().getImg())
+                        .img(orderProduct.getProduct().getProductImages() != null ? orderProduct.getProduct().getProductImages().get(0).getImageUrl() : "") //fix this
                         .build())
                 .toList();
     }

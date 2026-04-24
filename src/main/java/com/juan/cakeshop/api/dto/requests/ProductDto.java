@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Data
 @Builder
 public class ProductDto {
@@ -21,5 +23,5 @@ public class ProductDto {
     @NotNull(message = "category id is required")
     @Positive(message = "invalid categoryId")
     private Integer categoryId;
-    private MultipartFile img;
+    private List<MultipartFile> images;
 }
