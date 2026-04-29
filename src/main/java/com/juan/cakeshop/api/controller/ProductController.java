@@ -57,10 +57,11 @@ public class ProductController {
     @PutMapping("/{productId}")
     public ResponseEntity<GenericResponse<ProductResponse>> updateProduct(
             @PathVariable  int productId,
-            @ModelAttribute @Valid ProductDto productDto
+            @ModelAttribute @Valid ProductDto productDto,
+            @RequestParam(defaultValue = "false") boolean overWriteImages
     )
     {
-        ProductResponse productResponse = productService.updateProduct(productId, productDto);
+        ProductResponse productResponse = productService.updateProduct(productId, productDto, overWriteImages);
 
         return ResponseEntity.ok(GenericResponse.<ProductResponse>builder()
                 .ok(true)

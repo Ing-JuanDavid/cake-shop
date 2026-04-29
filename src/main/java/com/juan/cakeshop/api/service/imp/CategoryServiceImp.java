@@ -2,17 +2,15 @@ package com.juan.cakeshop.api.service.imp;
 
 import com.juan.cakeshop.api.dto.requests.CategoryFilterDto;
 import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
-import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.mapper.CategoryMapper;
 import com.juan.cakeshop.api.dto.requests.CategoryDto;
 import com.juan.cakeshop.api.dto.responses.CategoryResponse;
 import com.juan.cakeshop.api.mapper.ProductMapper;
 import com.juan.cakeshop.api.model.Category;
-import com.juan.cakeshop.api.model.Product;
+import com.juan.cakeshop.api.model.CloudinaryResponse;
 import com.juan.cakeshop.api.repository.CategoryRepository;
 import com.juan.cakeshop.api.service.CategoryService;
 import com.juan.cakeshop.api.specifications.CategorySpecification;
-import com.juan.cakeshop.api.specifications.ProductSpecification;
 import com.juan.cakeshop.exception.customExceptions.CategoryAlreadyExistsException;
 import com.juan.cakeshop.exception.customExceptions.CategoryNotFoundException;
 import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
@@ -22,8 +20,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,8 +44,8 @@ public class CategoryServiceImp implements CategoryService {
         Category category = categoryMapper.toEntity(categoryDto);
 
         if(categoryDto.getImg() != null && ! categoryDto.getImg().isEmpty()) {
-            imgUrl = cloudinaryServiceImp.uploadedImg(categoryDto.getImg(), "folder_2");
-            category.setImgUrl(imgUrl);
+           CloudinaryResponse response = cloudinaryServiceImp.uploadImg(categoryDto.getImg(), "folder_2");
+           category.setImgUrl(response.getImgUrl());
         }
 
         categoryRepository.save(category);
@@ -89,7 +90,7 @@ public class CategoryServiceImp implements CategoryService {
         );
 
         if(category.getImgUrl() != null && ! category.getImgUrl().isEmpty())
-            cloudinaryServiceImp.deleteImg("folder_2", category.getImgUrl());
+            cloudinaryServiceImp.deleteImg(category.getImgUrl());
 
         categoryRepository.delete(category);
 

@@ -19,4 +19,5 @@ public class ProductImage {
     @ManyToOne
     @JoinColumn(name = "product_id")
     Product product;
+    String publicId;
 }
