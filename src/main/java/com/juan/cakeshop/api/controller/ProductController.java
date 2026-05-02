@@ -84,9 +84,12 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{productId}")
-    public ResponseEntity<GenericResponse<ProductResponse>> deleteProduct(@PathVariable int productId)
+    public ResponseEntity<GenericResponse<ProductResponse>> deleteProduct(
+            @PathVariable int productId,
+            @RequestParam(defaultValue = "false") boolean delete // it is not going to delete from database
+    )
     {
-        ProductResponse productResponse = productService.deleteProduct(productId);
+        ProductResponse productResponse = productService.deleteProduct(productId, delete);
         return ResponseEntity.ok(GenericResponse.<ProductResponse>builder()
                 .ok(true)
                 .data(productResponse)
@@ -102,7 +105,9 @@ public class ProductController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) Integer minPrice,
             @RequestParam(required = false) Integer maxPrice,
-            @RequestParam(required = false) Boolean available)
+            @RequestParam(required = false) Boolean available,
+            @RequestParam(required = false) Boolean active
+    )
     {
         ProductFiltersDto filters = ProductFiltersDto.builder()
                 .name(name)
@@ -110,6 +115,7 @@ public class ProductController {
                 .minPrice(minPrice)
                 .maxPrice(maxPrice)
                 .available(available)
+                .isActive(active)
                 .build();
 
         return ResponseEntity.ok(GenericResponse.<PaginatedResponse<ProductResponse>>builder()

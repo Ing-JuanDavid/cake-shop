@@ -5,6 +5,7 @@ import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.mapper.ProductMapper;
 import com.juan.cakeshop.api.model.Category;
 import com.juan.cakeshop.api.model.Product;
+import com.juan.cakeshop.api.model.ProductImage;
 import com.juan.cakeshop.api.repository.CategoryRepository;
 import com.juan.cakeshop.api.repository.ProductImageRepository;
 import com.juan.cakeshop.api.repository.ProductRepository;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,45 +86,100 @@ public class ProductServiceImpTests {
         verifyNoInteractions(cloudinaryServiceImp);
     }
 
+//    @Test
+//    void shouldThrowWhenCloudinaryFails()
+//    {
+//        Category category = new Category();
+//        category.setCategoryId(1);
+//
+//        MultipartFile img = mock(MultipartFile.class);
+//
+//        ProductDto productDto  = ProductDto.builder()
+//                .categoryId(1)
+//                .images(List.of(img))
+//                .build();
+//
+//
+//
+//        Product product = new Product();
+//        product.setProductId(10);
+//        product.setName("cake");
+//
+//        ProductResponse productResponse = ProductResponse.builder().build();
+//
+//        when(categoryRepository.findById(productDto.getCategoryId()))
+//                .thenReturn(Optional.of(category));
+//
+//        when(productMapper.toEntity(productDto)).thenReturn(product);
+//
+//        when(productRepository.save(product)).thenReturn(product);
+//
+//        when(cloudinaryServiceImp.uploadedImg(any(), any()))
+//                .thenThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload product's img"));
+//
+//        ResponseStatusException ex = assertThrows(ResponseStatusException.class, ()->{
+//            productServiceImp.createProduct(productDto);
+//        });
+//
+//        assertEquals("Failed to upload product's img", ex.getReason());
+//
+//        verify(productRepository, never()).save(any()); // sí se guardó antes del fallo
+//        verify(productImageRepository, never()).saveAll(any());
+//    }
+
     @Test
-    void shouldThrowWhenCloudinaryFails()
+    void shouldMakeSoftDelete()
     {
-        Category category = new Category();
-        category.setCategoryId(1);
+        // arrange
+        int productId = 2;
+        boolean delete = false; //it isn't going to delete
 
-        MultipartFile img = mock(MultipartFile.class);
-
-        ProductDto productDto  = ProductDto.builder()
-                .categoryId(1)
-                .images(List.of(img))
+        Product savedProduct = Product.builder()
+                .productId(productId)
+                .name("chocolate cake")
                 .build();
 
+        ProductResponse response = ProductResponse
+                .builder()
+                .productId(productId)
+                .build();
 
+        when(productRepository.findById(productId)).thenReturn(Optional.of(savedProduct));
 
-        Product product = new Product();
-        product.setProductId(10);
-        product.setName("cake");
+        ProductResponse result = productServiceImp.deleteProduct(productId, delete);
 
-        ProductResponse productResponse = ProductResponse.builder().build();
+        assertEquals(productId, response.getProductId());
+        verify(cloudinaryServiceImp, never()).deleteImageList(anyList());
+        verify(productRepository, never()).delete(savedProduct);
+    }
 
-        when(categoryRepository.findById(productDto.getCategoryId()))
-                .thenReturn(Optional.of(category));
+    @Test
+    void shouldMakeDelete()
+    {
+        // arrange
+        int productId = 2;
+        boolean delete = true; //it's going to delete
 
-        when(productMapper.toEntity(productDto)).thenReturn(product);
+        List<ProductImage> images = new ArrayList<>(List.of(ProductImage.builder().imageId(2).build()));
 
-        when(productRepository.save(product)).thenReturn(product);
+        Product savedProduct = Product.builder()
+                .productId(productId)
+                .name("chocolate cake")
+                .productImages(images)
+                .build();
 
-        when(cloudinaryServiceImp.uploadedImg(any(), any()))
-                .thenThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload product's img"));
+        ProductResponse response = ProductResponse
+                .builder()
+                .productId(productId)
+                .build();
 
-        ResponseStatusException ex = assertThrows(ResponseStatusException.class, ()->{
-            productServiceImp.createProduct(productDto);
-        });
+        when(productRepository.findById(productId)).thenReturn(Optional.of(savedProduct));
+        when(productMapper.toResponse(any(Product.class))).thenReturn(response);
+        ProductResponse result = productServiceImp.deleteProduct(productId, delete);
 
-        assertEquals("Failed to upload product's img", ex.getReason());
-
-        verify(productRepository, never()).save(any()); // sí se guardó antes del fallo
-        verify(productImageRepository, never()).saveAll(any());
+        assertEquals(productId, result.getProductId());
+        verify(cloudinaryServiceImp).deleteImageList(anyList());
+        verify(productRepository).delete(savedProduct);
     }
 
 

@@ -3,6 +3,7 @@ package com.juan.cakeshop.api.dto.requests;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class ProductDto {
     @NotNull(message = "quantity is required")
     @PositiveOrZero(message = "invalid quant")
     private Integer quant;
+    private boolean isActive;
     @NotNull(message = "category id is required")
     @Positive(message = "invalid categoryId")
     private Integer categoryId;

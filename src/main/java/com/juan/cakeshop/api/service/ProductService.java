@@ -17,7 +17,10 @@ public interface ProductService {
 
     List<ProductResponse> getProductsByCategory(int categoryId);
 
-    ProductResponse deleteProduct(int productId);
+    /**
+     * delete param means the product will be deleted definitively from database(set true as value)
+     * **/
+    ProductResponse deleteProduct(int productId, boolean delete);
 
     // add addImages as a new boolean parameter (true for adding, false for overwriting the images)
     ProductResponse updateProduct(int productId, ProductDto productDto, boolean overWriteImages);

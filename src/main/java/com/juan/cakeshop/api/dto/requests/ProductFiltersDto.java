@@ -11,4 +11,5 @@ public class ProductFiltersDto {
     private Integer minPrice;
     private Integer maxPrice;
     private Boolean available;
+    private Boolean isActive;
 }

@@ -39,5 +39,12 @@ public class ProductSpecification {
                 isAvailable == null ? null : isAvailable  ? cb.greaterThan(root.get("quant"), 0) :  cb.equal(root.get("quant"), 0);
     }
 
+    public static  Specification<Product> hasActive(Boolean isActive)
+    {
+        return (root, query, cb) ->
+
+            isActive == null ? null : isActive ? cb.equal(root.get("isActive"), true) : cb.equal(root.get("isActive"),false);
+    }
+
 
 }

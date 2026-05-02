@@ -20,6 +20,7 @@ public class ProductMapper {
                 .description(productDto.getDescription())
                 .price(productDto.getPrice())
                 .quant(productDto.getQuant())
+                .isActive(productDto.isActive())
                 .build();
     }
 
@@ -36,6 +37,7 @@ public class ProductMapper {
                 .description(product.getDescription())
                 .categoryName(product.getCategory().getName())
                 .score(product.getScore())
+                .isActive(product.getIsActive())
                 .images(
                         product.getProductImages().stream()
                                 .map(ProductImage::getImageUrl)
@@ -56,6 +58,7 @@ public class ProductMapper {
         savedProduct.setPrice(productDto.getPrice());
         savedProduct.setDescription(productDto.getDescription());
         savedProduct.setQuant(productDto.getQuant());
+        savedProduct.setIsActive(productDto.isActive());
     }
 
     public PaginatedResponse<ProductResponse> toPaginatedResponse(Page<Product> page, int currentPage)

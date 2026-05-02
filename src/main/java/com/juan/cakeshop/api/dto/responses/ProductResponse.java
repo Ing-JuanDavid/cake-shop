@@ -17,4 +17,5 @@ public class ProductResponse {
     private Float score;
     private List<String> images;
     private Integer rateNumber;
+    private boolean isActive;
 }

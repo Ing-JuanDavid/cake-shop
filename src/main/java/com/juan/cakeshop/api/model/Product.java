@@ -1,5 +1,6 @@
 package com.juan.cakeshop.api.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,8 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
     private Float score;
+    @Nullable
+    private Boolean isActive;
     //private String img;
 
     @Builder.Default

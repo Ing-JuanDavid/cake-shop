@@ -50,7 +50,7 @@ public class ProductServiceImp implements ProductService {
                 ()-> new CategoryNotFoundException(categoryId)
         );
 
-        return productMapper.products(category.getProducts());
+        return productMapper.products(productRepository.findAllByCategoryCategoryIdAndIsActiveTrue(categoryId));
     }
 
     @Override
@@ -75,12 +75,17 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public ProductResponse deleteProduct(int productId) {
+    public ProductResponse deleteProduct(int productId, boolean delete) {
         if(productId <= 0) throw new InvalidProductIdException();
 
         Product savedProduct = productRepository.findById(productId).orElseThrow(
                 ()-> new ProductNotFoundException(productId)
         );
+
+        if(!delete) {
+            savedProduct.setIsActive(false);
+            return productMapper.toResponse(productRepository.save(savedProduct));
+        }
 
         List<ProductImage> existingImages = savedProduct.getProductImages();
         if(! existingImages.isEmpty()) {
@@ -124,7 +129,7 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public ProductResponse getProduct(int productId) {
-        Product product = productRepository.findById(productId).orElseThrow(
+        Product product = productRepository.findByProductIdAndIsActiveTrue(productId).orElseThrow(
                 ()-> new ProductNotFoundException(productId)
         );
 
@@ -143,6 +148,7 @@ public class ProductServiceImp implements ProductService {
                         .and(ProductSpecification.hasMinPrice(filters.getMinPrice()))
                         .and(ProductSpecification.hasMaxPrice(filters.getMaxPrice()))
                         .and(ProductSpecification.hasAvailable(filters.getAvailable())
+                                .and(ProductSpecification.hasActive(filters.getIsActive()))
                 );
 
         // create pageable — Spring handles startIndex/endIndex for you
