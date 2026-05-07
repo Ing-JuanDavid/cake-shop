@@ -2,6 +2,7 @@ package com.juan.cakeshop.api.service.imp;
 
 import com.juan.cakeshop.api.dto.requests.ProductFiltersDto;
 import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
+import com.juan.cakeshop.api.dto.responses.ProductSimpleResponse;
 import com.juan.cakeshop.api.mapper.ProductMapper;
 import com.juan.cakeshop.api.dto.requests.ProductDto;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
@@ -45,12 +46,12 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getProductsByCategory(int categoryId) {
+    public List<ProductSimpleResponse> getProductsByCategory(int categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(
                 ()-> new CategoryNotFoundException(categoryId)
         );
 
-        return productMapper.products(productRepository.findAllByCategoryCategoryIdAndIsActiveTrue(categoryId));
+        return productRepository.findActiveProductsByCategory(categoryId);
     }
 
     @Override

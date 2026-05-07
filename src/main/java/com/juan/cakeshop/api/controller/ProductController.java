@@ -5,6 +5,7 @@ import com.juan.cakeshop.api.dto.requests.ProductFiltersDto;
 import com.juan.cakeshop.api.dto.responses.GenericResponse;
 import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
+import com.juan.cakeshop.api.dto.responses.ProductSimpleResponse;
 import com.juan.cakeshop.api.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -70,12 +71,12 @@ public class ProductController {
     }
 
     @GetMapping("/categories/{categoryId}")
-    public ResponseEntity<GenericResponse<List<ProductResponse>>> getProductsByCategory(
+    public ResponseEntity<GenericResponse<List<ProductSimpleResponse>>> getProductsByCategory(
             @PathVariable int categoryId
     )
     {
         return ResponseEntity.ok(
-                GenericResponse.<List<ProductResponse>>builder()
+                GenericResponse.<List<ProductSimpleResponse>>builder()
                         .ok(true)
                         .data(productService.getProductsByCategory(categoryId))
                         .build()

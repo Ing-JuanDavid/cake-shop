@@ -5,6 +5,7 @@ import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
 import com.juan.cakeshop.api.model.Product;
 import com.juan.cakeshop.api.model.ProductImage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProductMapper {
+
+    private final RateMapper rateMapper;
+    private final ProductImageMapper productImageMapper;
+
     public Product toEntity(ProductDto productDto)
     {
         return Product.builder()
@@ -27,8 +33,6 @@ public class ProductMapper {
     public ProductResponse toResponse(Product product)
     {
 
-        int rateNumber = product.getRates().size();
-
         return ProductResponse.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
@@ -38,11 +42,8 @@ public class ProductMapper {
                 .categoryName(product.getCategory().getName())
                 .score(product.getScore())
                 .isActive(product.getIsActive())
-                .images(
-                        product.getProductImages().stream()
-                                .map(ProductImage::getImageUrl)
-                                .toList())
-                .rateNumber(rateNumber)
+                .images(productImageMapper.toList(product.getProductImages()))
+                .rates(rateMapper.toList(product.getRates()))
                 .build();
     }
 

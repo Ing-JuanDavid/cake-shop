@@ -4,6 +4,7 @@ import com.juan.cakeshop.api.dto.requests.ProductDto;
 import com.juan.cakeshop.api.dto.requests.ProductFiltersDto;
 import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
+import com.juan.cakeshop.api.dto.responses.ProductSimpleResponse;
 import com.juan.cakeshop.api.model.Product;
 import com.juan.cakeshop.api.model.ProductImage;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +16,7 @@ public interface ProductService {
 
     List<ProductResponse> getAllProducts();
 
-    List<ProductResponse> getProductsByCategory(int categoryId);
+    List<ProductSimpleResponse> getProductsByCategory(int categoryId);
 
     /**
      * delete param means the product will be deleted definitively from database(set true as value)

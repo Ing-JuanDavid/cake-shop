@@ -1,5 +1,6 @@
 package com.juan.cakeshop.api.dto.responses;
 
+import com.juan.cakeshop.api.model.Rate;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,7 +16,7 @@ public class ProductResponse {
     private String description;
     private String categoryName;
     private Float score;
-    private List<String> images;
-    private Integer rateNumber;
+    private List<ProductImageResponse> images;
+    private List<RateResponse> rates;
     private boolean isActive;
 }
