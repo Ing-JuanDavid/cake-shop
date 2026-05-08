@@ -58,7 +58,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse<CategoryResponse>> updateCategory(
             @PathVariable int categoryId,
-            @RequestBody @Valid CategoryDto categoryDto
+            @ModelAttribute @Valid CategoryDto categoryDto
     )
     {
         return ResponseEntity.ok(GenericResponse.<CategoryResponse>builder()

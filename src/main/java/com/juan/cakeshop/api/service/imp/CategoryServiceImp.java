@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -43,9 +44,11 @@ public class CategoryServiceImp implements CategoryService {
 
         Category category = categoryMapper.toEntity(categoryDto);
 
-        if(categoryDto.getImg() != null && ! categoryDto.getImg().isEmpty()) {
-           CloudinaryResponse response = cloudinaryServiceImp.uploadImg(categoryDto.getImg(), "folder_2");
+        MultipartFile img = categoryDto.getImg();
+        if(img != null && !img.isEmpty()) {
+           CloudinaryResponse response = cloudinaryServiceImp.uploadImg(categoryDto.getImg(), "categories");
            category.setImgUrl(response.getImgUrl());
+           category.setPublicIdImg(response.getPublicId());
         }
 
         categoryRepository.save(category);
@@ -78,9 +81,19 @@ public class CategoryServiceImp implements CategoryService {
 
         savedCategory = categoryMapper.updateCategoryFromDto(savedCategory, categoryDto);
 
-        Category updatedCategory = categoryRepository.save(savedCategory);
+        MultipartFile img = categoryDto.getImg();
+        if(img != null && !img.isEmpty())
+        {
+            if(savedCategory.getImgUrl() != null) {
+                cloudinaryServiceImp.deleteImg(savedCategory.getPublicIdImg());
+            }
 
-        return categoryMapper.toResponse(updatedCategory);
+            CloudinaryResponse res = cloudinaryServiceImp.uploadImg(img, "categories");
+            savedCategory.setImgUrl(res.getImgUrl());
+            savedCategory.setPublicIdImg(res.getPublicId());
+        }
+
+        return categoryMapper.toResponse(categoryRepository.save(savedCategory));
     }
 
     @Override
@@ -90,7 +103,7 @@ public class CategoryServiceImp implements CategoryService {
         );
 
         if(category.getImgUrl() != null && ! category.getImgUrl().isEmpty())
-            cloudinaryServiceImp.deleteImg(category.getImgUrl());
+            cloudinaryServiceImp.deleteImg(category.getPublicIdImg());
 
         categoryRepository.delete(category);
 
