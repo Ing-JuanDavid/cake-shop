@@ -3,8 +3,8 @@ package com.juan.cakeshop.api.mapper;
 import com.juan.cakeshop.api.dto.requests.ProductDto;
 import com.juan.cakeshop.api.dto.responses.PaginatedResponse;
 import com.juan.cakeshop.api.dto.responses.ProductResponse;
+import com.juan.cakeshop.api.model.Category;
 import com.juan.cakeshop.api.model.Product;
-import com.juan.cakeshop.api.model.ProductImage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -32,14 +32,14 @@ public class ProductMapper {
 
     public ProductResponse toResponse(Product product)
     {
-
+        Category category = product.getCategory();
         return ProductResponse.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .quant(product.getQuant())
                 .description(product.getDescription())
-                .categoryName(product.getCategory().getName())
+                .categoryName(category == null ? "" : category.getName())
                 .score(product.getScore())
                 .isActive(product.getIsActive())
                 .images(productImageMapper.toList(product.getProductImages()))

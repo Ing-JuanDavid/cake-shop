@@ -26,6 +26,12 @@ public class Category {
     private String publicIdImg;
 
     @Builder.Default
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "category", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
+
+    public void removeCategoryFromProducts()
+    {
+        this.products.forEach(p -> p.setCategory(null));
+        this.products.clear();
+    }
 }

@@ -27,7 +27,8 @@ public class Product {
     private String description;
     private Integer quant;
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
+    @Nullable
+    @JoinColumn(name = "category_id")
     private Category category;
     private Float score;
     @Nullable

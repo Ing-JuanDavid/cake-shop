@@ -14,6 +14,7 @@ import com.juan.cakeshop.api.specifications.CategorySpecification;
 import com.juan.cakeshop.exception.customExceptions.CategoryAlreadyExistsException;
 import com.juan.cakeshop.exception.customExceptions.CategoryNotFoundException;
 import com.juan.cakeshop.exception.customExceptions.InvalidInputException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -97,6 +98,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryResponse deleteCategory(int categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(
                 ()-> new CategoryNotFoundException(categoryId)
@@ -105,6 +107,7 @@ public class CategoryServiceImp implements CategoryService {
         if(category.getImgUrl() != null && ! category.getImgUrl().isEmpty())
             cloudinaryServiceImp.deleteImg(category.getPublicIdImg());
 
+        category.removeCategoryFromProducts();
         categoryRepository.delete(category);
 
         return categoryMapper.toResponse(category);

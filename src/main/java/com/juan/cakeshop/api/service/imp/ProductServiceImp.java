@@ -104,10 +104,15 @@ public class ProductServiceImp implements ProductService {
         Product savedProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
 
-        if (!Objects.equals(productDto.getCategoryId(), savedProduct.getCategory().getCategoryId())) {
-            Category category = categoryRepository.findById(productDto.getCategoryId())
-                    .orElseThrow(() -> new CategoryNotFoundException(productDto.getCategoryId()));
-            savedProduct.setCategory(category);
+        Category newCategory;
+        if(productDto.getCategoryId() != null) {
+            newCategory = categoryRepository.findById(productDto.getCategoryId()).orElseThrow(
+                    ()-> new CategoryNotFoundException(productDto.getCategoryId())
+            );
+
+            if(savedProduct.getCategory() == null || !savedProduct.getCategory().getCategoryId().equals(newCategory.getCategoryId())) {
+                savedProduct.setCategory(newCategory);
+            }
         }
 
         productMapper.updateFromDto(productDto, savedProduct);
