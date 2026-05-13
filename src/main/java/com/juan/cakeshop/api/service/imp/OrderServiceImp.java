@@ -89,7 +89,7 @@ public class OrderServiceImp implements OrderService {
 
         List<Order> orders = user.getOrders().stream()
                 .filter(order -> order.getOrderProducts().stream()
-                        .anyMatch(orderProduct -> orderProduct.getProduct().getProductId()==productId))
+                        .anyMatch(orderProduct -> orderProduct.getProductId()==productId))
                 .toList();
 
 

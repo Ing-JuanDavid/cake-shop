@@ -18,8 +18,9 @@ public class OrderProduct {
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    private Integer productId;
+    private String productName;
     private Integer quant;
+    private Integer price;
+    private String imageUrl;
 }
