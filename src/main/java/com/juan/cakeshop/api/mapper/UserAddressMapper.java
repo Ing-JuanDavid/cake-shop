@@ -18,6 +18,7 @@ public class UserAddressMapper {
                 .addressLine(addressDto.getAddressLine())
                 .description(addressDto.getDescription())
                 .isDefault(addressDto.isDefault())
+                .isActive(true)
                 .user(user).build();
     }
 
