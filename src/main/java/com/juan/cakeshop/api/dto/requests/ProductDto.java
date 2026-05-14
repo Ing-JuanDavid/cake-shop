@@ -22,7 +22,6 @@ public class ProductDto {
     @PositiveOrZero(message = "invalid quant")
     private Integer quant;
     private boolean isActive;
-    @NotNull(message = "category id is required")
     @Positive(message = "invalid categoryId")
     private Integer categoryId;
     private List<MultipartFile> images;

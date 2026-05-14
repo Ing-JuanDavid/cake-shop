@@ -58,21 +58,20 @@ public class ProductServiceImp implements ProductService {
     @Transactional
     public ProductResponse createProduct(ProductDto productDto) {
 
-        Category category = categoryRepository.findById(productDto.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(productDto.getCategoryId()));
-
         Product product = productMapper.toEntity(productDto);
-        product.setCategory(category);
-        productRepository.save(product);
+        if(productDto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(productDto.getCategoryId())
+                    .orElseThrow(() -> new CategoryNotFoundException(productDto.getCategoryId()));
+            product.setCategory(category);
+        }
 
          if(productDto.getImages() != null && !productDto.getImages().isEmpty())
          {
              List<ProductImage> images = this.uploadProductImageList(productDto.getImages(), product);
-             productImageRepository.saveAll(images);
              product.setProductImages(images);
          }
 
-        return productMapper.toResponse(product);
+        return productMapper.toResponse(productRepository.save(product));
     }
 
     @Override
@@ -104,15 +103,18 @@ public class ProductServiceImp implements ProductService {
         Product savedProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
 
-        Category newCategory;
-        if(productDto.getCategoryId() != null) {
-            newCategory = categoryRepository.findById(productDto.getCategoryId()).orElseThrow(
+        Integer newCategoryId = productDto.getCategoryId();
+        if(newCategoryId != null) {
+            Category newCategory = categoryRepository.findById(newCategoryId).orElseThrow(
                     ()-> new CategoryNotFoundException(productDto.getCategoryId())
             );
 
-            if(savedProduct.getCategory() == null || !savedProduct.getCategory().getCategoryId().equals(newCategory.getCategoryId())) {
+            if(savedProduct.getCategory() == null || !savedProduct.getCategory().getCategoryId().equals(newCategoryId)) {
                 savedProduct.setCategory(newCategory);
             }
+        }
+        else {
+            savedProduct.setCategory(null);
         }
 
         productMapper.updateFromDto(productDto, savedProduct);
