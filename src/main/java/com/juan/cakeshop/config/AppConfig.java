@@ -3,6 +3,7 @@ package com.juan.cakeshop.config;
 import com.juan.cakeshop.api.model.User;
 import com.juan.cakeshop.api.model.UserDetailsImp;
 import com.juan.cakeshop.api.repository.UserRepository;
+import com.resend.Resend;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
