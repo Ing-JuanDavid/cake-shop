@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("images")
-@CrossOrigin(origins = "http://localhost:4200")
 public class PorductImageController {
 
     private final ProductImageService productImageService;

@@ -41,6 +41,9 @@ public class AuthServiceImp implements com.juan.cakeshop.api.service.AuthService
     final EmailService emailService;
     final AuthMapper authMapper;
 
+    @Value("${frontend.url}")
+    String frontUrl;
+
     public AuthResponse register(RegisterDto registerDto)
     {
         if(userRepository.existsByEmail(registerDto.getEmail()))
@@ -104,7 +107,7 @@ public class AuthServiceImp implements com.juan.cakeshop.api.service.AuthService
                 .build();
         passwordResetTokenRepository.save(passwordResetToken);
 
-        emailService.sendPasswordResetLink(user.getEmail(), "http://localhost:4200/auth/recovery-password?token="+resetToken);
+        emailService.sendPasswordResetLink(user.getEmail(), this.frontUrl+"/auth/recovery-password?token="+resetToken);
     }
 
     @Override
