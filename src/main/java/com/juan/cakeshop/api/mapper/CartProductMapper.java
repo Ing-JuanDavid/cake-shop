@@ -4,6 +4,7 @@ import com.juan.cakeshop.api.dto.responses.CartResponse;
 import com.juan.cakeshop.api.model.Cart;
 import com.juan.cakeshop.api.model.CartProduct;
 import com.juan.cakeshop.api.model.Product;
+import com.juan.cakeshop.api.model.ProductImage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,13 +22,14 @@ public class CartProductMapper {
     public CartResponse toResponse(CartProduct cartProduct) {
 
         Product product = cartProduct.getProduct();
+        List<ProductImage> images = product.getProductImages();
         return CartResponse.builder()
                 .productId(product.getProductId())
                 .name(cartProduct.getProduct().getName())
                 .price(cartProduct.getProduct().getPrice())
                 .quant(cartProduct.getQuant())
                 .stock(product.getQuant())
-                .img(product.getProductImages() != null ? product.getProductImages().get(0).getImageUrl(): "") //fix this
+                .img(images != null && !images.isEmpty()  ? product.getProductImages().get(0).getImageUrl(): "") //fix this
                 .build();
     }
 
