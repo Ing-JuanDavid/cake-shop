@@ -20,9 +20,6 @@ services:
       - db
     links:
       - db
-    environment:
-      SPRING_PROFILES_ACTIVE: prod
-
     env_file:
       - .env
 volumes:
