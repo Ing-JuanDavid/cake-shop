@@ -53,11 +53,11 @@ public class UserServiceImp implements UserService {
     public ProfileInfo createUser(UserRegisterDto userRegisterDto) {
 
         if(userRepository.existsById(userRegisterDto.getNip())) {
-            throw new UserAlreadyExistException("NIP", userRegisterDto.getNip().toString());
+            throw new UserAlreadyExistException("NIP");
         }
 
         if(userRepository.existsByEmail(userRegisterDto.getEmail())) {
-            throw new UserAlreadyExistException("email", userRegisterDto.getEmail());
+            throw new UserAlreadyExistException("Email");
         }
 
         User user = userRepository.save(userMapper.toEntity(userRegisterDto));

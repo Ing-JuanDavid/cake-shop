@@ -47,10 +47,10 @@ public class AuthServiceImp implements com.juan.cakeshop.api.service.AuthService
     public AuthResponse register(RegisterDto registerDto)
     {
         if(userRepository.existsByEmail(registerDto.getEmail()))
-            throw new UserAlreadyExistException("email", registerDto.getEmail());
+            throw new UserAlreadyExistException("Email");
 
         if(userRepository.existsByNip(registerDto.getNip()))
-            throw new UserAlreadyExistException("NIP", String.valueOf(registerDto.getNip()));
+            throw new UserAlreadyExistException("NIP");
 
         User user = authMapper.toEntity(registerDto);
 

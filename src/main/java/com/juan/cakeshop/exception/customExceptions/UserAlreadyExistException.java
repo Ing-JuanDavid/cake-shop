@@ -3,8 +3,8 @@ package com.juan.cakeshop.exception.customExceptions;
 import org.springframework.http.HttpStatus;
 
 public class UserAlreadyExistException extends BusinessException{
-    public UserAlreadyExistException(String field, String value)
+    public UserAlreadyExistException(String field)
     {
-        super(String.format("Already exist an user with %s: %s", field, value), HttpStatus.CONFLICT);
+        super(String.format("%s inválido", field), HttpStatus.CONFLICT);
     }
 }

@@ -34,6 +34,7 @@ public class AuthMapper {
                 .sex(registerDto.getSex())
                 .rol(Rol.USER)
                 .telf(registerDto.getTelf())
+                .accountNonLocked(true)
                 .build();
     }
 
